@@ -19,4 +19,32 @@ class CompteService{
     return await api.getObject("comptes/$numeroCompte/history?page=$page&limit=$limit");
   }
 
+  Future<Map<String, dynamic>> transfer({
+    required String numeroCompte,
+    required String telephoneDestinataire,
+    required int montant,
+  }) async {
+    return await api.post(
+      "comptes/$numeroCompte/transfer",
+      {
+        "telephone": telephoneDestinataire,
+        "montant": montant
+      },
+    );
+  }
+
+  Future<Map<String, dynamic>> payement({
+    required String numeroCompte,
+    required String codeMerchant,
+    required int montant,
+  }) async {
+    return await api.post(
+      "comptes/$numeroCompte/payment",
+      {
+        "code_marchand": codeMerchant,
+        "montant": montant
+      },
+    );
+  }
+
 }
