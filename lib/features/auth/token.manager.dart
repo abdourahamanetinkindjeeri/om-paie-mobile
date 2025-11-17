@@ -5,7 +5,7 @@ class TokenManager {
   String? _accessToken;
   String? _refreshToken;
 
-  // Optionnel : fichier local pour persister les tokens
+  // Fichier local pour persister les tokens
   final String storageFile;
 
   TokenManager({this.storageFile = 'tokens.json'});
@@ -13,40 +13,63 @@ class TokenManager {
   String? get accessToken => _accessToken;
   String? get refreshToken => _refreshToken;
 
-  void setTokens({required String accessToken, required String refreshToken}) {
+  /// Définit les tokens et les sauvegarde dans un fichier
+  Future<void> setTokens({
+    required String accessToken,
+    required String refreshToken,
+  }) async {
     _accessToken = accessToken;
     _refreshToken = refreshToken;
-    _saveToFile();
+    await _saveToFile();
   }
 
-  void clearTokens() {
+  /// Supprime les tokens en mémoire et du fichier
+  Future<void> clearTokens() async {
     _accessToken = null;
     _refreshToken = null;
-    _deleteFile();
+    await _deleteFile();
   }
 
+  /// Sauvegarde les tokens dans un fichier JSON
   Future<void> _saveToFile() async {
-    final file = File(storageFile);
-    final data = {
-      'access_token': _accessToken,
-      'refresh_token': _refreshToken,
-    };
-    await file.writeAsString(jsonEncode(data));
-  }
-
-  Future<void> loadTokens() async {
-    final file = File(storageFile);
-    if (await file.exists()) {
-      final data = jsonDecode(await file.readAsString());
-      _accessToken = data['access_token'];
-      _refreshToken = data['refresh_token'];
+    try {
+      final file = File(storageFile);
+      final data = {
+        'access_token': _accessToken,
+        'refresh_token': _refreshToken,
+      };
+      await file.writeAsString(jsonEncode(data));
+    } catch (e) {
+      print("Erreur lors de la sauvegarde des tokens: $e");
     }
   }
 
+  /// Charge les tokens depuis le fichier, si disponible
+  Future<void> loadTokens() async {
+    try {
+      final file = File(storageFile);
+      if (await file.exists()) {
+        final content = await file.readAsString();
+        if (content.isNotEmpty) {
+          final Map<String, dynamic> data = jsonDecode(content);
+          _accessToken = data['access_token'] as String?;
+          _refreshToken = data['refresh_token'] as String?;
+        }
+      }
+    } catch (e) {
+      print("Erreur lors du chargement des tokens: $e");
+    }
+  }
+
+  /// Supprime le fichier contenant les tokens
   Future<void> _deleteFile() async {
-    final file = File(storageFile);
-    if (await file.exists()) {
-      await file.delete();
+    try {
+      final file = File(storageFile);
+      if (await file.exists()) {
+        await file.delete();
+      }
+    } catch (e) {
+      print("Erreur lors de la suppression du fichier de tokens: $e");
     }
   }
 }

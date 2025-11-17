@@ -3,18 +3,32 @@ import 'package:http/http.dart' as http;
 
 import 'package:om_paie_flutter/core/errors/api.exception.dart';
 import 'package:om_paie_flutter/core/network/iapi.service.dart';
+import 'package:om_paie_flutter/features/auth/token.manager.dart';
 
 class ApiServiceImpl implements IApiService {
   final String baseUrl;
   final http.Client client;
+  final TokenManager tokenManager; // plus nullable
 
-  ApiServiceImpl(this.baseUrl, {http.Client? client})
-      : client = client ?? http.Client();
+  ApiServiceImpl(
+      this.baseUrl, {
+        required this.tokenManager,
+        http.Client? client,
+      }) : client = client ?? http.Client();
 
-  Map<String, String> _jsonHeaders() => {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  };
+  Map<String, String> _jsonHeaders() {
+    final headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    };
+
+    if (tokenManager?.accessToken != null) {
+      headers['Authorization'] = 'Bearer ${tokenManager!.accessToken}';
+    }
+
+    return headers;
+  }
+
 
   // ----------------------------------------------------------
   // GET (retourne une LISTE)
