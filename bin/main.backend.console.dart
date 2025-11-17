@@ -51,4 +51,30 @@ void main() async {
   } catch (e) {
     print("\n❌ Erreur : $e");
   }
+
+  // --- Récupérer le profil si token présent ---
+  if (tokenManager.accessToken != null) {
+    try {
+      final profile = await authService.getProfile();
+
+      print("\n✅ Profil utilisateur récupéré :");
+      print("Nom : ${profile['user']['nom']} ${profile['user']['prenom']}");
+      print("Téléphone : ${profile['user']['telephone']}");
+      print("Email : ${profile['user']['email']}");
+
+      print("\n💼 Comptes :");
+      for (var compte in profile['comptes']) {
+        print("- ${compte['numero_compte']} : ${compte['solde']} ${compte['devise']} (${compte['type']})");
+      }
+
+      print("\n📜 Historique transactions (dernières) :");
+      for (var tx in profile['historique_transactions'].take(20)) {
+        print("- ${tx['date_transaction']} | ${tx['type']} | ${tx['montant']} | ${tx['direction']}");
+      }
+    } catch (e) {
+      print("\n❌ Erreur lors de la récupération du profil : $e");
+    }
+  } else {
+    print("⚠️ Aucun token trouvé. Veuillez vous connecter d'abord.");
+  }
 }

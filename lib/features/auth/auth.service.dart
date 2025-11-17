@@ -65,6 +65,9 @@ class AuthService {
     return response; // success, message, access_token, refresh_token
   }
 
+  Future<Map<String, dynamic>> getProfile() async {
+    return await api.getObject("auth/me");
+  }
 
 }
 
