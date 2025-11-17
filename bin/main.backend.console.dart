@@ -68,12 +68,12 @@ void main() async {
 
     final confirmResponse = await authService.confirmLoginOTP(
       telephone: telephone,
-      codeOtp: otp,
+      otpCode: otp, // otp = stdin.readLineSync()
     );
 
     print("\n✅ Login confirmé !");
-    print("Access Token : ${confirmResponse['data']['access_token']}");
-    print("Refresh Token: ${confirmResponse['data']['refresh_token']}");
+    print("Access Token : ${confirmResponse['access_token']}");
+    print("Refresh Token: ${confirmResponse['refresh_token']}");
 
   } catch (e) {
     print("\n❌ Erreur : $e");

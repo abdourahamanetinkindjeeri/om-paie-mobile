@@ -48,26 +48,23 @@ class AuthService {
     return response;
   }
 
-  /// Confirmation via OTP
   Future<Map<String, dynamic>> confirmLoginOTP({
     required String telephone,
-    required String codeOtp,
+    required String otpCode, // ← note le nom
   }) async {
     final body = {
       "telephone": telephone,
-      "code_otp": codeOtp,
+      "otp_code": otpCode, // ← clé exacte attendue par le backend
     };
-    
-    print(body);
 
-    // ✅ Correction : on envoie directement body
     final response = await api.post(
-      "/auth/login/confirm",
+      "auth/login/confirm", // ← endpoint exact du Swagger
       body,
     );
 
-    return response; // success, message, data(tokens)
+    return response; // success, message, access_token, refresh_token
   }
+
 
 }
 
