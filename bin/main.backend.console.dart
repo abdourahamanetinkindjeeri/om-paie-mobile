@@ -86,7 +86,7 @@ Future<void> inscription(AuthService authService) async {
 
     print("\n${green}📩 OTP envoyé à $telephone${reset}");
     print("${green}Message : ${res.message}${reset}");
-    print("${green} OTP : (${res.codeOtp})");
+    print("\n ${green} OTP : (${res.codeOtp})");
     print("${green}Expire dans : ${res.expiresInMinutes} minutes${reset}");
 
     stdout.write("\n${blue}👉 Entrez le code OTP reçu : ${reset}");
