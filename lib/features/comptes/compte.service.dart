@@ -6,13 +6,17 @@ class CompteService{
   CompteService(this.api);
 
 
-  Future<double> getAccountBalance(String numeroCompte) async {
-    final response = await api.getByPath("wallets/", '$numeroCompte/balance');
+  Future<Map<String, dynamic>> getBalance(String numeroCompte) async {
+    return await api.getObject("comptes/$numeroCompte/balance");
+  }
 
-    // Supposons que l’API renvoie { "balance": 62000 }
-    final balance = (response['balance'] as num).toDouble();
 
-    return balance;
+  Future<Map<String, dynamic>> getHistory(
+      String numeroCompte, {
+        int page = 1,
+        int limit = 10,
+      }) async {
+    return await api.getObject("comptes/$numeroCompte/history?page=$page&limit=$limit");
   }
 
 }
