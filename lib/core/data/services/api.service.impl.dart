@@ -13,11 +13,11 @@ class ApiServiceImpl implements IApiService {
   bool _isRefreshing = false;
 
   ApiServiceImpl(
-      this.baseUrl, {
-        required this.tokenManager,
-        this.refreshCallback,
-        http.Client? client,
-      }) : client = client ?? http.Client();
+    this.baseUrl, {
+    required this.tokenManager,
+    this.refreshCallback,
+    http.Client? client,
+  }) : client = client ?? http.Client();
 
   Map<String, String> _jsonHeaders() {
     final headers = {
@@ -49,7 +49,8 @@ class ApiServiceImpl implements IApiService {
           await tokenManager.setTokens(
             accessToken: newAccessToken,
             refreshToken: newRefreshToken,
-            accessTokenExpiry: DateTime.now().add(Duration(hours: 1)), // adjust based on backend
+            accessTokenExpiry: DateTime.now()
+                .add(Duration(hours: 1)), // adjust based on backend
           );
           // Retry the original request
           return await request();
@@ -61,7 +62,6 @@ class ApiServiceImpl implements IApiService {
       }
     }
   }
-
 
   // ----------------------------------------------------------
   // GET (retourne une LISTE)
@@ -121,7 +121,8 @@ class ApiServiceImpl implements IApiService {
   // POST
   // ----------------------------------------------------------
   @override
-  Future<Map<String, dynamic>> post(String endpoint, Map<String, dynamic> data) async {
+  Future<Map<String, dynamic>> post(
+      String endpoint, Map<String, dynamic> data) async {
     return _executeWithRetry(() async {
       final response = await client.post(
         Uri.parse('$baseUrl/$endpoint'),
@@ -141,7 +142,8 @@ class ApiServiceImpl implements IApiService {
   // PUT
   // ----------------------------------------------------------
   @override
-  Future<Map<String, dynamic>> put(String endpoint, Map<String, dynamic> data) async {
+  Future<Map<String, dynamic>> put(
+      String endpoint, Map<String, dynamic> data) async {
     final response = await client.put(
       Uri.parse('$baseUrl/$endpoint'),
       headers: _jsonHeaders(),
@@ -208,13 +210,13 @@ class ApiServiceImpl implements IApiService {
       // Errors Laravel / Node ou backend custom
       if (statusCode >= 400) {
         final message = decoded['message'] ?? "Erreur $method";
-        
+
         // Extraction des détails de validation pour 422
         Map<String, dynamic>? details;
         if (statusCode == 422 && decoded['errors'] != null) {
           details = decoded['errors'] as Map<String, dynamic>?;
         }
-        
+
         throw ApiException(message, statusCode, details: details);
       }
 
