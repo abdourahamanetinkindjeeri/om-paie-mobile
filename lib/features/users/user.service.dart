@@ -17,6 +17,10 @@ class UserService {
     return User.fromJson(data);
   }
 
+  /// Récupérer le QR code de l'utilisateur (format SVG)
+  Future<String> getUserQrCode() async {
+    return await api.getRaw("user/qrcode");
+  }
 
   // Future<void> getUserById(String id) async {
   //   final user = await api.getByPath("users", id);

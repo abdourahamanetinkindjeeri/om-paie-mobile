@@ -19,4 +19,7 @@ abstract class IApiService {
 
   /// DELETE
   Future<void> delete(String endpoint);
+
+  /// GET raw data (SVG, images, etc.)
+  Future<String> getRaw(String endpoint);
 }

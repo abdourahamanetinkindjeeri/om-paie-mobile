@@ -4,6 +4,7 @@ import 'dart:io';
 class TokenManager {
   String? _accessToken;
   String? _refreshToken;
+  DateTime? _accessTokenExpiry;
 
   // Fichier local pour persister les tokens
   final String storageFile;
@@ -12,14 +13,23 @@ class TokenManager {
 
   String? get accessToken => _accessToken;
   String? get refreshToken => _refreshToken;
+  DateTime? get accessTokenExpiry => _accessTokenExpiry;
+
+  /// Vérifie si l'access token est expiré
+  bool get isAccessTokenExpired {
+    if (_accessToken == null || _accessTokenExpiry == null) return true;
+    return DateTime.now().isAfter(_accessTokenExpiry!);
+  }
 
   /// Définit les tokens et les sauvegarde dans un fichier
   Future<void> setTokens({
     required String accessToken,
     required String refreshToken,
+    DateTime? accessTokenExpiry,
   }) async {
     _accessToken = accessToken;
     _refreshToken = refreshToken;
+    _accessTokenExpiry = accessTokenExpiry ?? DateTime.now().add(Duration(hours: 1)); // default 1h
     await _saveToFile();
   }
 
@@ -27,6 +37,7 @@ class TokenManager {
   Future<void> clearTokens() async {
     _accessToken = null;
     _refreshToken = null;
+    _accessTokenExpiry = null;
     await _deleteFile();
   }
 
@@ -37,6 +48,7 @@ class TokenManager {
       final data = {
         'access_token': _accessToken,
         'refresh_token': _refreshToken,
+        'access_token_expiry': _accessTokenExpiry?.toIso8601String(),
       };
       await file.writeAsString(jsonEncode(data));
     } catch (e) {
@@ -54,6 +66,9 @@ class TokenManager {
           final Map<String, dynamic> data = jsonDecode(content);
           _accessToken = data['access_token'] as String?;
           _refreshToken = data['refresh_token'] as String?;
+          _accessTokenExpiry = data['access_token_expiry'] != null
+              ? DateTime.parse(data['access_token_expiry'])
+              : null;
         }
       }
     } catch (e) {

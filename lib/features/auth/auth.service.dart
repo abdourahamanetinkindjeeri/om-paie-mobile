@@ -1,4 +1,5 @@
 import 'package:om_paie_flutter/core/data/services/api.service.impl.dart';
+import 'package:om_paie_flutter/core/errors/api.exception.dart';
 import 'package:om_paie_flutter/features/auth/register.response.dart';
 
 class AuthService {
@@ -67,6 +68,22 @@ class AuthService {
 
   Future<Map<String, dynamic>> getProfile() async {
     return await api.getObject("auth/me");
+  }
+
+  /// Refresh access token using refresh token
+  Future<Map<String, dynamic>> refreshToken() async {
+    final refreshToken = api.tokenManager.refreshToken;
+    if (refreshToken == null) {
+      throw ApiException("No refresh token available", 401);
+    }
+
+    final body = {
+      "refresh_token": refreshToken,
+    };
+
+    final response = await api.post("auth/refresh", body);
+
+    return response; // success, message, access_token, refresh_token (optional)
   }
 
 }

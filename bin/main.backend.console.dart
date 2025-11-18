@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:om_paie_flutter/core/data/services/api.service.impl.dart';
+import 'package:om_paie_flutter/core/errors/api.exception.dart';
 import 'package:om_paie_flutter/features/auth/auth.service.dart';
 import 'package:om_paie_flutter/features/auth/token.manager.dart';
 import 'package:om_paie_flutter/features/comptes/compte.service.dart';
+import 'package:om_paie_flutter/features/users/user.service.dart';
 
 // === Codes ANSI ===
 const String green = "\x1B[32m";
@@ -21,6 +23,7 @@ Future<void> main() async {
 
   final authService = AuthService(api);
   final compteService = CompteService(api);
+  final userService = UserService(api);
 
   while (true) {
     print("\n===== ${blue}🏦 MENU PRINCIPAL${reset} =====");
@@ -34,7 +37,7 @@ Future<void> main() async {
     if (choix == "1") {
       await inscription(authService);
     } else if (choix == "2") {
-      await loginMenu(authService, compteService, tokenManager);
+      await loginMenu(authService, compteService, userService, tokenManager);
     } else if (choix == "3") {
       print("${blue}👋 Au revoir !${reset}");
       break;
@@ -43,6 +46,144 @@ Future<void> main() async {
     }
   }
 }
+
+// ================= VALIDATION =================
+bool isValidEmail(String email) {
+  final emailRegex =
+      RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+  return emailRegex.hasMatch(email);
+}
+
+bool isValidPhone(String phone) {
+  final phoneRegex = RegExp(r'^\+221[0-9]{9}$');
+  return phoneRegex.hasMatch(phone);
+}
+
+bool isValidNumeroPiece(String numero, String type) {
+  if (type == 'cni') {
+    // Format attendu: chiffres avec tirets ou lettre + 13 chiffres
+    final cniRegex1 = RegExp(r'^\d{1}-\d{3}-\d{3}-\d{3}-\d{3}-\d{2}$');
+    final cniRegex2 = RegExp(r'^[A-Z]\d{13}$');
+    return cniRegex1.hasMatch(numero) || cniRegex2.hasMatch(numero);
+  } else if (type == 'passport') {
+    // Format attendu: lettre + 13 chiffres
+    final passportRegex = RegExp(r'^[A-Z]\d{13}$');
+    return passportRegex.hasMatch(numero);
+  } else if (type == 'permis') {
+    // Format attendu: lettre + 13 chiffres
+    final permisRegex = RegExp(r'^[A-Z]\d{13}$');
+    return permisRegex.hasMatch(numero);
+  }
+  return false;
+}
+
+bool isValidPin(String code) {
+  final pinRegex = RegExp(r'^\d{4}$');
+  return pinRegex.hasMatch(code);
+}
+
+// ================= INSCRIPTION =================
+// Future<void> inscription(AuthService authService) async {
+//   print("\n===== ${blue}📝 INSCRIPTION UTILISATEUR${reset} =====\n");
+
+//   String telephone;
+//   do {
+//     stdout.write("${blue}Téléphone (+221...) : ${reset}");
+//     telephone = stdin.readLineSync()?.trim() ?? "";
+//     if (!isValidPhone(telephone)) {
+//       print(
+//           "${red}❌ Format téléphone invalide. Utilisez +221XXXXXXXXX${reset}");
+//     }
+//   } while (!isValidPhone(telephone));
+
+//   String email;
+//   do {
+//     stdout.write("${blue}Email : ${reset}");
+//     email = stdin.readLineSync()?.trim() ?? "";
+//     if (!isValidEmail(email)) {
+//       print("${red}❌ Format email invalide. Exemple: nom@domaine.com${reset}");
+//     }
+//   } while (!isValidEmail(email));
+
+//   stdout.write("${blue}Nom : ${reset}");
+//   final nom = stdin.readLineSync()?.trim() ?? "";
+
+//   stdout.write("${blue}Prénom : ${reset}");
+//   final prenom = stdin.readLineSync()?.trim() ?? "";
+
+//   String typePiece;
+//   // do {
+//     stdout.write("${blue}Type pièce (cni/passport/permis) : ${reset}");
+//     typePiece = stdin.readLineSync()?.trim() ?? "";
+//     // if (!['cni', 'passport', 'permis'].contains(typePiece)) {
+//     //   print(
+//     //       "${red}❌ Type pièce invalide. Choisissez: cni, passport, ou permis${reset}");
+//     // }
+//   // } while (!['cni', 'passport', 'permis'].contains(typePiece));
+
+//   String numeroPiece;
+//   do {
+//     stdout.write("${blue}Numéro pièce : ${reset}");
+//     numeroPiece = stdin.readLineSync()?.trim() ?? "";
+//     if (!isValidNumeroPiece(numeroPiece, typePiece)) {
+//       if (typePiece == 'cni') {
+//         print(
+//             "${red}❌ Format CNI invalide. Exemple: 1-234-567-890-123-45 ou A1234567890123${reset}");
+//       } else {
+//         print("${red}❌ Format invalide. Exemple: A1234567890123${reset}");
+//       }
+//     }
+//   } while (!isValidNumeroPiece(numeroPiece, typePiece));
+
+//   stdout.write("${blue}Adresse : ${reset}");
+//   final adresse = stdin.readLineSync()?.trim() ?? "";
+
+//   String code;
+//   do {
+//     stdout.write("${blue}Code PIN à 4 chiffres : ${reset}");
+//     code = stdin.readLineSync()?.trim() ?? "";
+//     if (!isValidPin(code)) {
+//       print("${red}❌ Code PIN doit être exactement 4 chiffres${reset}");
+//     }
+//   } while (!isValidPin(code));
+
+//   try {
+//     final res = await authService.register({
+//       "telephone": telephone,
+//       "email": email,
+//       "nom": nom,
+//       "prenom": prenom,
+//       "type_piece": typePiece,
+//       "numero_piece": numeroPiece,
+//       "adresse": adresse,
+//       "code": int.parse(code)
+//     });
+
+//     print("\n${green}📩 OTP envoyé à $telephone${reset}");
+//     print("${green}Message : ${res.message}${reset}");
+//     print("\n ${green} OTP : (${res.codeOtp})");
+//     print("${green}Expire dans : ${res.expiresInMinutes} minutes${reset}");
+
+//     stdout.write("\n${blue}👉 Entrez le code OTP reçu : ${reset}");
+//     final otp = stdin.readLineSync()?.trim() ?? "";
+
+//     if (otp.isEmpty) {
+//       print("${red}⚠️ OTP manquant.${reset}");
+//       return;
+//     }
+
+//     final confirm = await authService.confirmRegister(
+//       telephone: telephone,
+//       codeOtp: otp,
+//     );
+
+//     print("\n${green}✅ INSCRIPTION RÉUSSIE !${reset}");
+//     print("${green}Message : ${confirm['message']}${reset}");
+//     print("${green}Utilisateur créé : ${confirm['data']}${reset}");
+//   } catch (e) {
+//     print("${red}❌ Erreur lors de l'inscription : $e${reset}");
+//   }
+// }
 
 // ================= INSCRIPTION =================
 Future<void> inscription(AuthService authService) async {
@@ -60,7 +201,7 @@ Future<void> inscription(AuthService authService) async {
   stdout.write("${blue}Prénom : ${reset}");
   final prenom = stdin.readLineSync()?.trim() ?? "";
 
-  stdout.write("${blue}Type pièce (cin/passport/permis) : ${reset}");
+  stdout.write("${blue}Type pièce (cin/passport) : ${reset}");
   final typePiece = stdin.readLineSync()?.trim() ?? "";
 
   stdout.write("${blue}Numéro pièce : ${reset}");
@@ -107,12 +248,34 @@ Future<void> inscription(AuthService authService) async {
     print("${green}Utilisateur créé : ${confirm['data']}${reset}");
 
   } catch (e) {
-    print("${red}❌ Erreur lors de l'inscription : $e${reset}");
+    if (e is ApiException) {
+      print("${red}❌ Erreur lors de l'inscription :${reset}");
+      print("${red}   Message : ${e.message}${reset}");
+      print("${red}   Code HTTP : ${e.statusCode}${reset}");
+      
+      if (e.details != null && e.details!.isNotEmpty) {
+        print("\n${red}📋 Détails des erreurs de validation :${reset}");
+        e.details!.forEach((field, errors) {
+          print("${red}   • $field :${reset}");
+          if (errors is List) {
+            for (var error in errors) {
+              print("${red}     - $error${reset}");
+            }
+          } else {
+            print("${red}     - $errors${reset}");
+          }
+        });
+      }
+    } else {
+      print("${red}❌ Erreur lors de l'inscription : $e${reset}");
+    }
   }
 }
 
+
 // ================= LOGIN =================
-Future<void> loginMenu(AuthService authService, CompteService compteService, TokenManager tokenManager) async {
+Future<void> loginMenu(AuthService authService, CompteService compteService,
+    UserService userService, TokenManager tokenManager) async {
   stdout.write("\n${blue}Téléphone : ${reset}");
   final telephone = stdin.readLineSync()?.trim() ?? "";
 
@@ -120,7 +283,8 @@ Future<void> loginMenu(AuthService authService, CompteService compteService, Tok
   final code = stdin.readLineSync()?.trim() ?? "";
 
   try {
-    final loginResponse = await authService.login(telephone: telephone, code: code);
+    final loginResponse =
+        await authService.login(telephone: telephone, code: code);
 
     print("\n${green}${loginResponse['message']}${reset}");
     print("${green}➡️ OTP (pour test) : ${loginResponse['code_otp']}${reset}");
@@ -141,8 +305,7 @@ Future<void> loginMenu(AuthService authService, CompteService compteService, Tok
       refreshToken: confirmResponse['refresh_token'],
     );
 
-    await compteMenu(compteService);
-
+    await userMenu(compteService, userService);
   } catch (e) {
     print("${red}❌ Erreur login : $e${reset}");
   }
@@ -161,7 +324,8 @@ Future<void> compteMenu(CompteService compteService) async {
   // --- Solde ---
   try {
     final balanceData = await compteService.getBalance(numeroCompte);
-    print("\n${green}💰 Solde du compte $numeroCompte : ${balanceData['solde']} XOF${reset}");
+    print(
+        "\n${green}💰 Solde du compte $numeroCompte : ${balanceData['solde']} XOF${reset}");
   } catch (e) {
     print("${red}❌ Impossible de récupérer le solde : $e${reset}");
   }
@@ -200,14 +364,14 @@ Date      : ${tx['date_transaction']}
       print("-----------------------------");
       print("${blue}Page ${historyResponse['pagination']['current_page']} "
           "/ ${historyResponse['pagination']['total_pages']}${reset}");
-
     } catch (e) {
       print("${red}❌ Impossible de récupérer l'historique : $e${reset}");
     }
   }
 
   // --- Transfert ---
-  stdout.write("\n${blue}Voulez-vous effectuer un transfert ? (o/n) : ${reset}");
+  stdout
+      .write("\n${blue}Voulez-vous effectuer un transfert ? (o/n) : ${reset}");
   final transfertChoice = stdin.readLineSync()?.trim().toLowerCase() ?? "";
 
   if (transfertChoice == "o") {
@@ -243,7 +407,6 @@ Destinataire : ${data['destinataire']['numero']}
 Nom          : ${data['destinataire']['nom_complet']}
 ----------------------------------------
 """);
-
       } catch (e) {
         print("${red}❌ Erreur transfert : $e${reset}");
       }
@@ -284,12 +447,64 @@ Date       : ${data['date_payment'] ?? DateTime.now()}
 Destinataire: ${data['destinataire']?['nom_complet'] ?? codeMerchant}
 ----------------------------------------
 """);
-
       } catch (e) {
         print("${red}❌ Erreur paiement : $e${reset}");
       }
     } else {
       print("${red}⚠️ Données de paiement invalides.${reset}");
     }
+  }
+}
+
+// ================= MENU UTILISATEUR =================
+Future<void> userMenu(
+    CompteService compteService, UserService userService) async {
+  while (true) {
+    print("\n===== ${blue}👤 MENU UTILISATEUR${reset} =====");
+    print("1. Opérations sur compte");
+    print("2. Récupérer QR Code");
+    print("3. Retour au menu principal");
+
+    stdout.write("\n${blue}Votre choix : ${reset}");
+    final choix = stdin.readLineSync()?.trim() ?? "";
+
+    if (choix == "1") {
+      await compteMenu(compteService);
+    } else if (choix == "2") {
+      await getQrCode(userService);
+    } else if (choix == "3") {
+      break;
+    } else {
+      print("${red}⚠️ Choix invalide, réessayez.${reset}");
+    }
+  }
+}
+
+// ================= QR CODE =================
+Future<void> getQrCode(UserService userService) async {
+  print("\n===== ${blue}📱 RÉCUPÉRATION QR CODE${reset} =====\n");
+
+  try {
+    print("${blue}🔄 Récupération du QR code utilisateur...${reset}");
+
+    final qrCodeSvg = await userService.getUserQrCode();
+
+    print("${green}✅ QR Code récupéré avec succès !${reset}");
+    print("${blue}📄 Contenu SVG (aperçu) :${reset}");
+    print(qrCodeSvg.substring(0, 200) + "...");
+
+    // Sauvegarder le QR code dans un fichier
+    final fileName = "qrcode_user_${DateTime.now().millisecondsSinceEpoch}.svg";
+    final file = File(fileName);
+    await file.writeAsString(qrCodeSvg);
+
+    print("${green}💾 QR Code sauvegardé dans : ${file.path}${reset}");
+
+    // Afficher des instructions
+    print("\n${blue}💡 Pour visualiser le QR code :${reset}");
+    print("   - Ouvrez le fichier SVG dans un navigateur web");
+    print("   - Ou utilisez un lecteur de QR code");
+  } catch (e) {
+    print("${red}❌ Erreur lors de la récupération du QR code : $e${reset}");
   }
 }
