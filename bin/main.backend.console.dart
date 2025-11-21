@@ -22,12 +22,12 @@ Future<void> main() async {
   final userService = UserService(api);
 
   while (true) {
-    print("\n===== ${blue}🏦 MENU PRINCIPAL${reset} =====");
+    print("\n===== ${blue}🏦 MENU PRINCIPAL$reset =====");
     print("1. Inscription");
     print("2. Login");
     print("3. Quitter");
 
-    stdout.write("\n${blue}Votre choix : ${reset}");
+    stdout.write("\n${blue}Votre choix : $reset");
     final choix = stdin.readLineSync()?.trim() ?? "";
 
     if (choix == "1") {
@@ -35,10 +35,10 @@ Future<void> main() async {
     } else if (choix == "2") {
       await loginMenu(authService, compteService, userService, tokenManager);
     } else if (choix == "3") {
-      print("${blue}👋 Au revoir !${reset}");
+      print("$blue 👋 Au revoir !$reset");
       break;
     } else {
-      print("${red}⚠️ Choix invalide, réessayez.${reset}");
+      print("${red}⚠️ Choix invalide, réessayez.$reset");
     }
   }
 }

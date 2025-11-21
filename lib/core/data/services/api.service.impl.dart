@@ -50,7 +50,7 @@ class ApiServiceImpl implements IApiService {
             accessToken: newAccessToken,
             refreshToken: newRefreshToken,
             accessTokenExpiry: DateTime.now()
-                .add(Duration(hours: 1)), // adjust based on backend
+                .add(const Duration(hours: 1)), // adjust based on backend
           );
           // Retry the original request
           return await request();
