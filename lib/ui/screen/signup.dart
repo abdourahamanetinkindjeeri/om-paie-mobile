@@ -1,36 +1,877 @@
 import 'package:flutter/material.dart';
 
-class Login extends StatefulWidget {
-  const Login({super.key});
-
-  @override
-  State<Login> createState() => _LoginState();
+void main() {
+  runApp(const OrangeMoneyApp());
 }
 
-class _LoginState extends State<Login> {
-  final List<Map<String, String>> _carouselItems = const [
-    {
-      'icon': '↗️',
-      'title': 'Transférer',
-      'description':
-          'Envoyez rapidement et en toute sécurité de l\'argent à un proche qui possède un compte Orange Money.',
-      "image": "assets/images/transfer.png"
-    },
-    {
-      'icon': '📱',
-      'title': 'Payer',
-      'description':
-          'Payez vos factures et vos achats en toute simplicité avec Orange Money.',
-    },
-    {
-      'icon': '💰',
-      'title': 'Économiser',
-      'description':
-          'Gérez votre argent facilement et en toute sécurité avec Orange Money.',
-    },
-  ];
+// Custom Clip Path pour la forme ondulée
+class CustomClipPath extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    double width = size.width;
+    double height = size.height;
+    final path = Path();
+
+    path.moveTo(0, height);
+    path.quadraticBezierTo(width / 4, height - 100, width / 2, height - 50);
+    path.quadraticBezierTo(3 * width / 4, height, width, height - 80);
+    path.lineTo(width, 0);
+    path.lineTo(0, 0);
+    path.close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
+class OrangeMoneyApp extends StatelessWidget {
+  const OrangeMoneyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return MaterialApp(
+      title: 'Orange Money',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primaryColor: const Color(0xFFFF6B00),
+        scaffoldBackgroundColor: Colors.black,
+      ),
+      home: const LoginScreen(),
+    );
+  }
+}
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _phoneController = TextEditingController();
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF1A1A1A),
+      body: Column(
+        children: [
+          _buildCarouselSection(),
+          _buildFormSection(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCarouselSection() {
+    return Expanded(
+      flex: 6,
+      child: PageView(
+        controller: _pageController,
+        onPageChanged: (int index) {
+          setState(() {
+            _currentPage = index;
+          });
+        },
+        children: <Widget>[
+          _buildCarouselPage(
+            title: 'Transférer',
+            description:
+                'Envoyez rapidement et en toute\nsécurité de l\'argent à un proche qui\npossède un compte Orange Money.',
+          ),
+          _buildCarouselPage(
+            title: 'Recevoir',
+            description:
+                'Recevez de l\'argent en toute sécurité\nsur votre compte Orange Money\npartout et à tout moment.',
+          ),
+          _buildCarouselPage(
+            title: 'Payer',
+            description:
+                'Effectuez vos paiements rapidement\net en toute sécurité avec\nOrange Money.',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCarouselPage({
+    required String title,
+    required String description,
+  }) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
+      child: Stack(
+        children: <Widget>[
+          Positioned.fill(
+            child: ClipPath(
+              clipper: CustomClipPath(),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(40),
+                  topRight: Radius.circular(40),
+                ),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: <Widget>[
+                    Image.network(
+                      'https://www.gstatic.com/flutter-onestack-prototype/genui/example_1.jpg',
+                      fit: BoxFit.cover,
+                      errorBuilder: (BuildContext context, Object error,
+                          StackTrace? stackTrace) {
+                        return Container(
+                          color: Colors.grey[800],
+                          child: const Icon(
+                            Icons.person,
+                            size: 100,
+                            color: Colors.grey,
+                          ),
+                        );
+                      },
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: <Color>[
+                            Colors.black.withOpacity(0.6),
+                            Colors.black.withOpacity(0.85),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 30,
+            left: 20,
+            right: 20,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 45,
+                      height: 45,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: const Color(0xFFFF6B00),
+                          width: 2.5,
+                        ),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.arrow_forward_rounded,
+                          color: Color(0xFFFF6B00),
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Container(
+                      width: 45,
+                      height: 45,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFF6B00),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: const Color(0xFFFFAB00),
+                          width: 2.5,
+                        ),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.check_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    RichText(
+                      text: const TextSpan(
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: 'Orange ',
+                            style: TextStyle(
+                              color: Color(0xFFFF6B00),
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          TextSpan(
+                            text: 'Money',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 26,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 35),
+                RichText(
+                  text: TextSpan(
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: '$title ',
+                        style: const TextStyle(
+                          color: Color(0xFFFF6B00),
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          height: 1.2,
+                        ),
+                      ),
+                      const TextSpan(
+                        text: 'de l\'argent',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.w300,
+                          height: 1.2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  description,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFormSection() {
+    return Expanded(
+      flex: 5,
+      child: Container(
+        color: const Color(0xFF1A1A1A),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          child: Column(
+            children: <Widget>[
+              _buildPageIndicators(),
+              const SizedBox(height: 35),
+              const Text(
+                'Bienvenue sur OM Pay!',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Entrez votre numéro mobile pour vous\nconnecter',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFF9E9E9E),
+                  fontSize: 14,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 28),
+              _buildPhoneInputRow(),
+              const SizedBox(height: 24),
+              _buildLoginButton(),
+              const SizedBox(height: 18),
+              const Text(
+                '© Copyright - Orange Money Group, tous droits réservés',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFF6E6E6E),
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPageIndicators() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: List<Widget>.generate(3, (int index) {
+        final bool isActive = _currentPage == index;
+        return GestureDetector(
+          onTap: () {
+            _pageController.animateToPage(
+              index,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            );
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            width: isActive ? 16 : 12,
+            height: isActive ? 16 : 12,
+            decoration: BoxDecoration(
+              color:
+                  isActive ? const Color(0xFFFF6B00) : const Color(0xFF505050),
+              shape: BoxShape.circle,
+            ),
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildPhoneInputRow() {
+    return Row(
+      children: <Widget>[
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 18),
+          decoration: BoxDecoration(
+            color: const Color(0xFF2A2A2A),
+            border: Border.all(color: const Color(0xFF404040)),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                width: 28,
+                height: 20,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                child: const Text(
+                  '🇸🇳',
+                  style: TextStyle(fontSize: 20),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                '+ 221',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(width: 6),
+              const Icon(
+                Icons.keyboard_arrow_down,
+                color: Colors.white,
+                size: 22,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: TextField(
+            controller: _phoneController,
+            keyboardType: TextInputType.phone,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+            ),
+            decoration: InputDecoration(
+              hintText: 'Saisir mon numéro',
+              hintStyle: const TextStyle(
+                color: Color(0xFF6E6E6E),
+                fontSize: 15,
+              ),
+              filled: true,
+              fillColor: const Color(0xFF2A2A2A),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: Color(0xFF404040)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: Color(0xFF404040)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(
+                  color: Color(0xFFFF6B00),
+                  width: 2,
+                ),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 18,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoginButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: () {
+          if (_phoneController.text.isNotEmpty) {
+            Navigator.push(
+              context,
+              MaterialPageRoute<PinCodeScreen>(
+                builder: (BuildContext context) => PinCodeScreen(
+                  phoneNumber: _phoneController.text,
+                ),
+              ),
+            );
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFFF6B00),
+          padding: const EdgeInsets.symmetric(vertical: 18),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 0,
+        ),
+        child: const Text(
+          'Se connecter',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// Écran de saisie du code PIN à 4 chiffres
+class PinCodeScreen extends StatefulWidget {
+  final String phoneNumber;
+
+  const PinCodeScreen({Key? key, required this.phoneNumber}) : super(key: key);
+
+  @override
+  State<PinCodeScreen> createState() => _PinCodeScreenState();
+}
+
+class _PinCodeScreenState extends State<PinCodeScreen> {
+  final List<TextEditingController> _controllers =
+      List<TextEditingController>.generate(
+    4,
+    (int index) => TextEditingController(),
+  );
+  final List<FocusNode> _focusNodes = List<FocusNode>.generate(
+    4,
+    (int index) => FocusNode(),
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _focusNodes[0].requestFocus();
+    });
+  }
+
+  @override
+  void dispose() {
+    for (TextEditingController controller in _controllers) {
+      controller.dispose();
+    }
+    for (FocusNode node in _focusNodes) {
+      node.dispose();
+    }
+    super.dispose();
+  }
+
+  String get pinCode {
+    return _controllers.map<String>((TextEditingController c) => c.text).join();
+  }
+
+  void _onPinChanged(int index, String value) {
+    if (value.isNotEmpty && index < 3) {
+      _focusNodes[index + 1].requestFocus();
+    } else if (value.isEmpty && index > 0) {
+      _focusNodes[index - 1].requestFocus();
+    }
+
+    if (pinCode.length == 4) {
+      Future<void>.delayed(const Duration(milliseconds: 300), () {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Code PIN: $pinCode'),
+              backgroundColor: const Color(0xFFFF6B00),
+            ),
+          );
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF1A1A1A),
+      body: Column(
+        children: [
+          _buildCarouselSection(),
+          _buildPinFormSection(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCarouselSection() {
+    return Expanded(
+      flex: 6,
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: ClipPath(
+                clipper: CustomClipPath(),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(40),
+                    topRight: Radius.circular(40),
+                  ),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: <Widget>[
+                      Image.network(
+                        'https://www.gstatic.com/flutter-onestack-prototype/genui/example_1.jpg',
+                        fit: BoxFit.cover,
+                        errorBuilder: (BuildContext context, Object error,
+                            StackTrace? stackTrace) {
+                          return Container(
+                            color: Colors.grey[800],
+                            child: const Icon(
+                              Icons.person,
+                              size: 100,
+                              color: Colors.grey,
+                            ),
+                          );
+                        },
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: <Color>[
+                              Colors.black.withOpacity(0.6),
+                              Colors.black.withOpacity(0.85),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 30,
+              left: 20,
+              right: 20,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    children: <Widget>[
+                      Container(
+                        width: 45,
+                        height: 45,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: const Color(0xFFFF6B00),
+                            width: 2.5,
+                          ),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Color(0xFFFF6B00),
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Container(
+                        width: 45,
+                        height: 45,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFF6B00),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: const Color(0xFFFFAB00),
+                            width: 2.5,
+                          ),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.check_rounded,
+                            color: Colors.white,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      RichText(
+                        text: const TextSpan(
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: 'Orange ',
+                              style: TextStyle(
+                                color: Color(0xFFFF6B00),
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            TextSpan(
+                              text: 'Money',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 35),
+                  RichText(
+                    text: const TextSpan(
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: 'Code PIN ',
+                          style: TextStyle(
+                            color: Color(0xFFFF6B00),
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            height: 1.2,
+                          ),
+                        ),
+                        TextSpan(
+                          text: 'de sécurité',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.w300,
+                            height: 1.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  const Text(
+                    'Saisissez votre code PIN à 4 chiffres\npour accéder à votre compte\nOrange Money en toute sécurité.',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 15,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Bouton retour en haut à droite (cercle)
+            Positioned(
+              top: 30,
+              right: 20,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: 45,
+                  height: 45,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF2A2A2A).withOpacity(0.8),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: const Color(0xFF404040),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPinFormSection() {
+    return Expanded(
+      flex: 5,
+      child: Container(
+        color: const Color(0xFF1A1A1A),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          child: Column(
+            children: <Widget>[
+              const SizedBox(height: 20),
+              const Text(
+                'Entrez votre code PIN',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '+221 ${widget.phoneNumber}',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Color(0xFF9E9E9E),
+                  fontSize: 14,
+                  height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 35),
+              // Champs PIN
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List<Widget>.generate(4, (int index) {
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 6),
+                    width: 60,
+                    height: 70,
+                    child: TextField(
+                      controller: _controllers[index],
+                      focusNode: _focusNodes[index],
+                      textAlign: TextAlign.center,
+                      keyboardType: TextInputType.number,
+                      maxLength: 1,
+                      obscureText: true,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      decoration: InputDecoration(
+                        counterText: '',
+                        filled: true,
+                        fillColor: const Color(0xFF2A2A2A),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: Color(0xFF404040)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: Color(0xFF404040)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFFF6B00),
+                            width: 2,
+                          ),
+                        ),
+                      ),
+                      onChanged: (String value) => _onPinChanged(index, value),
+                      onTap: () {
+                        _controllers[index].selection =
+                            TextSelection.fromPosition(
+                          TextPosition(offset: _controllers[index].text.length),
+                        );
+                      },
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 30),
+              // Bouton valider
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: pinCode.length == 4
+                      ? () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Connexion réussie !'),
+                              backgroundColor: Color(0xFFFF6B00),
+                            ),
+                          );
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFFF6B00),
+                    disabledBackgroundColor: const Color(0xFF404040),
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Valider',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              const Text(
+                '© Copyright - Orange Money Group, tous droits réservés',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFF6E6E6E),
+                  fontSize: 11,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
