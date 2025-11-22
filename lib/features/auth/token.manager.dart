@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:om_paie_flutter/features/auth/itoken_manager.dart';
 
-class TokenManager {
+class TokenManager implements ITokenManager {
   String? _accessToken;
   String? _refreshToken;
   DateTime? _accessTokenExpiry;

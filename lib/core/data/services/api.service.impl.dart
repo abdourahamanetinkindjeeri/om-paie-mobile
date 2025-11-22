@@ -3,12 +3,12 @@ import 'package:http/http.dart' as http;
 
 import 'package:om_paie_flutter/core/errors/api.exception.dart';
 import 'package:om_paie_flutter/core/network/iapi.service.dart';
-import 'package:om_paie_flutter/features/auth/token.manager.dart';
+import 'package:om_paie_flutter/features/auth/itoken_manager.dart';
 
 class ApiServiceImpl implements IApiService {
   final String baseUrl;
   final http.Client client;
-  final TokenManager tokenManager; // plus nullable
+  final ITokenManager tokenManager;
   final Future<Map<String, dynamic>> Function()? refreshCallback;
   bool _isRefreshing = false;
 

@@ -1,17 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/constants/app_strings.dart';
+import 'package:om_paie_flutter/core/data/services/api.service.impl.dart';
+import 'package:om_paie_flutter/features/auth/auth.service.dart';
+import 'package:om_paie_flutter/features/auth/token_manager_mobile.dart';
 import 'package:om_paie_flutter/ui/widgets/carousel_section.dart';
 import 'package:om_paie_flutter/ui/widgets/login_form_section.dart';
+import 'package:om_paie_flutter/ui/widgets/otp_form_section.dart';
 import 'package:om_paie_flutter/ui/widgets/pin_carousel_section.dart';
 import 'package:om_paie_flutter/ui/widgets/pin_form_section.dart';
 
-void main() {
-  runApp(const OrangeMoneyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialiser les services
+  final tokenManager = TokenManagerMobile();
+  await tokenManager.loadTokens();
+
+  final apiService = ApiServiceImpl(
+    'http://localhost:8000/api', // Ajuster l'URL selon le backend
+    tokenManager: tokenManager,
+    client: http.Client(),
+  );
+
+  final authService = AuthService(apiService);
+
+  runApp(OrangeMoneyApp(
+    authService: authService,
+    tokenManager: tokenManager,
+  ));
 }
 
 class OrangeMoneyApp extends StatelessWidget {
-  const OrangeMoneyApp({Key? key}) : super(key: key);
+  final AuthService authService;
+  final TokenManagerMobile tokenManager;
+
+  const OrangeMoneyApp({
+    Key? key,
+    required this.authService,
+    required this.tokenManager,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +51,23 @@ class OrangeMoneyApp extends StatelessWidget {
         primaryColor: AppColors.primary,
         scaffoldBackgroundColor: Colors.black,
       ),
-      home: const LoginScreen(),
+      home: LoginScreen(
+        authService: authService,
+        tokenManager: tokenManager,
+      ),
     );
   }
 }
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  final AuthService authService;
+  final TokenManagerMobile tokenManager;
+
+  const LoginScreen({
+    Key? key,
+    required this.authService,
+    required this.tokenManager,
+  }) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -72,6 +111,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   MaterialPageRoute<PinCodeScreen>(
                     builder: (BuildContext context) => PinCodeScreen(
                       phoneNumber: _phoneController.text,
+                      authService: widget.authService,
+                      tokenManager: widget.tokenManager,
                     ),
                   ),
                 );
@@ -82,25 +123,26 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-
-
-
-
 }
 
 // Écran de saisie du code PIN à 4 chiffres
 class PinCodeScreen extends StatefulWidget {
   final String phoneNumber;
+  final AuthService authService;
+  final TokenManagerMobile tokenManager;
 
-  const PinCodeScreen({Key? key, required this.phoneNumber}) : super(key: key);
+  const PinCodeScreen({
+    Key? key,
+    required this.phoneNumber,
+    required this.authService,
+    required this.tokenManager,
+  }) : super(key: key);
 
   @override
   State<PinCodeScreen> createState() => _PinCodeScreenState();
 }
 
 class _PinCodeScreenState extends State<PinCodeScreen> {
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -108,11 +150,13 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
       body: Column(
         children: [
           const PinCarouselSection(),
-          PinFormSection(phoneNumber: widget.phoneNumber),
+          PinFormSection(
+            phoneNumber: widget.phoneNumber,
+            authService: widget.authService,
+            tokenManager: widget.tokenManager,
+          ),
         ],
       ),
     );
   }
-
-
 }

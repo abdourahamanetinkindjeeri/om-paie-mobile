@@ -3,14 +3,13 @@ import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/constants/app_strings.dart';
 import 'package:om_paie_flutter/features/auth/auth.service.dart';
 import 'package:om_paie_flutter/features/auth/itoken_manager.dart';
-import 'package:om_paie_flutter/ui/screen/otp_screen.dart';
 
-class PinFormSection extends StatefulWidget {
+class OtpFormSection extends StatefulWidget {
   final String phoneNumber;
   final AuthService authService;
   final ITokenManager tokenManager;
 
-  const PinFormSection({
+  const OtpFormSection({
     Key? key,
     required this.phoneNumber,
     required this.authService,
@@ -18,16 +17,16 @@ class PinFormSection extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<PinFormSection> createState() => _PinFormSectionState();
+  State<OtpFormSection> createState() => _OtpFormSectionState();
 }
 
-class _PinFormSectionState extends State<PinFormSection> {
+class _OtpFormSectionState extends State<OtpFormSection> {
   final List<TextEditingController> _controllers = List<TextEditingController>.generate(
-    4,
+    6,
     (int index) => TextEditingController(),
   );
   final List<FocusNode> _focusNodes = List<FocusNode>.generate(
-    4,
+    6,
     (int index) => FocusNode(),
   );
 
@@ -50,73 +49,23 @@ class _PinFormSectionState extends State<PinFormSection> {
     super.dispose();
   }
 
-  String get pinCode {
+  String get otpCode {
     return _controllers.map<String>((TextEditingController c) => c.text).join();
   }
 
-  void _onPinChanged(int index, String value) {
-    if (value.isNotEmpty && index < 3) {
+  void _onOtpChanged(int index, String value) {
+    if (value.isNotEmpty && index < 5) {
       _focusNodes[index + 1].requestFocus();
     } else if (value.isEmpty && index > 0) {
       _focusNodes[index - 1].requestFocus();
     }
 
-    if (pinCode.length == 4) {
-      _performLogin();
+    if (otpCode.length == 6) {
+      _confirmOtp();
     }
   }
 
-  Future<void> _performLogin() async {
-    try {
-      final loginResponse = await widget.authService.login(
-        telephone: widget.phoneNumber,
-        code: pinCode,
-      );
-
-      if (mounted) {
-        _showOtpConfirmationDialog(loginResponse['code_otp']);
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erreur login: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  void _showOtpConfirmationDialog(String otpCode) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Confirmation OTP'),
-          content: const Text('Voulez-vous utiliser le code OTP automatiquement ou le saisir manuellement ?'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _confirmOtpDirectly(otpCode);
-              },
-              child: const Text('Utiliser automatiquement'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                _navigateToOtpScreen();
-              },
-              child: const Text('Saisir manuellement'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Future<void> _confirmOtpDirectly(String otpCode) async {
+  Future<void> _confirmOtp() async {
     try {
       final confirmResponse = await widget.authService.confirmLoginOTP(
         telephone: widget.phoneNumber,
@@ -150,19 +99,6 @@ class _PinFormSectionState extends State<PinFormSection> {
     }
   }
 
-  void _navigateToOtpScreen() {
-    Navigator.push(
-      context,
-      MaterialPageRoute<OtpScreen>(
-        builder: (BuildContext context) => OtpScreen(
-          phoneNumber: widget.phoneNumber,
-          authService: widget.authService,
-          tokenManager: widget.tokenManager,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -175,7 +111,7 @@ class _PinFormSectionState extends State<PinFormSection> {
             children: <Widget>[
               const SizedBox(height: 20),
               Text(
-                AppStrings.pinInstruction,
+                'Saisir le code OTP',
                 style: const TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 22,
@@ -193,24 +129,23 @@ class _PinFormSectionState extends State<PinFormSection> {
                 ),
               ),
               const SizedBox(height: 35),
-              // Champs PIN
+              // Champs OTP
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: List<Widget>.generate(4, (int index) {
+                children: List<Widget>.generate(6, (int index) {
                   return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 6),
-                    width: 60,
-                    height: 70,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: 50,
+                    height: 60,
                     child: TextField(
                       controller: _controllers[index],
                       focusNode: _focusNodes[index],
                       textAlign: TextAlign.center,
                       keyboardType: TextInputType.number,
                       maxLength: 1,
-                      obscureText: true,
                       style: const TextStyle(
                         color: AppColors.textPrimary,
-                        fontSize: 28,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                       decoration: InputDecoration(
@@ -233,7 +168,7 @@ class _PinFormSectionState extends State<PinFormSection> {
                           ),
                         ),
                       ),
-                      onChanged: (String value) => _onPinChanged(index, value),
+                      onChanged: (String value) => _onOtpChanged(index, value),
                       onTap: () {
                         _controllers[index].selection = TextSelection.fromPosition(
                           TextPosition(offset: _controllers[index].text.length),
@@ -244,40 +179,6 @@ class _PinFormSectionState extends State<PinFormSection> {
                 }),
               ),
               const SizedBox(height: 30),
-              // Bouton valider
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: pinCode.length == 4
-                      ? () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Connexion réussie !'),
-                              backgroundColor: AppColors.primary,
-                            ),
-                          );
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    disabledBackgroundColor: AppColors.border,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    AppStrings.validateButton,
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 18),
               Text(
                 AppStrings.copyright,
                 textAlign: TextAlign.center,
