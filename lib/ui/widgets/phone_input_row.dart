@@ -2,13 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/constants/app_strings.dart';
 
-class PhoneInputRow extends StatelessWidget {
+class PhoneInputRow extends StatefulWidget {
   final TextEditingController controller;
+  final ValueChanged<String>? onCountryCodeChanged;
 
   const PhoneInputRow({
     Key? key,
     required this.controller,
+    this.onCountryCodeChanged,
   }) : super(key: key);
+
+  @override
+  State<PhoneInputRow> createState() => _PhoneInputRowState();
+}
+
+class _PhoneInputRowState extends State<PhoneInputRow> {
+  String _countryCode = '+221';
+  String _countryFlag = '🇸🇳';
+
+  String get fullPhoneNumber => '$_countryCode${widget.controller.text}';
+
+  @override
+  void initState() {
+    super.initState();
+    // Notifier le code pays initial
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.onCountryCodeChanged?.call(_countryCode);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,13 +52,13 @@ class PhoneInputRow extends StatelessWidget {
                   borderRadius: BorderRadius.circular(3),
                 ),
                 child: Text(
-                  AppStrings.countryFlag,
+                  _countryFlag,
                   style: const TextStyle(fontSize: 20),
                 ),
               ),
               const SizedBox(width: 8),
               Text(
-                AppStrings.countryCode,
+                _countryCode,
                 style: const TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 15,
@@ -56,7 +77,7 @@ class PhoneInputRow extends StatelessWidget {
         const SizedBox(width: 12),
         Expanded(
           child: TextField(
-            controller: controller,
+            controller: widget.controller,
             keyboardType: TextInputType.phone,
             style: const TextStyle(
               color: AppColors.textPrimary,

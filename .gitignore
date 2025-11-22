@@ -43,3 +43,7 @@ app.*.map.json
 /android/app/release
 ./tokens.json
 
+# Environment variables
+.env
+assets/.env
+

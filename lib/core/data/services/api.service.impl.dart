@@ -19,6 +19,15 @@ class ApiServiceImpl implements IApiService {
     http.Client? client,
   }) : client = client ?? http.Client();
 
+  // Normalise l'endpoint pour éviter les doubles slashes
+  String _normalizeEndpoint(String endpoint) {
+    // Enlever le slash initial si présent
+    if (endpoint.startsWith('/')) {
+      endpoint = endpoint.substring(1);
+    }
+    return endpoint;
+  }
+
   Map<String, String> _jsonHeaders() {
     final headers = {
       'Content-Type': 'application/json',
@@ -69,8 +78,9 @@ class ApiServiceImpl implements IApiService {
   @override
   Future<List<dynamic>> get(String endpoint) async {
     return _executeWithRetry(() async {
+      final normalizedEndpoint = _normalizeEndpoint(endpoint);
       final response = await client.get(
-        Uri.parse('$baseUrl/$endpoint'),
+        Uri.parse('$baseUrl/$normalizedEndpoint'),
         headers: _jsonHeaders(),
       );
 
@@ -88,8 +98,9 @@ class ApiServiceImpl implements IApiService {
   @override
   Future<Map<String, dynamic>> getObject(String endpoint) async {
     return _executeWithRetry(() async {
+      final normalizedEndpoint = _normalizeEndpoint(endpoint);
       final response = await client.get(
-        Uri.parse('$baseUrl/$endpoint'),
+        Uri.parse('$baseUrl/$normalizedEndpoint'),
         headers: _jsonHeaders(),
       );
 
@@ -124,8 +135,12 @@ class ApiServiceImpl implements IApiService {
   Future<Map<String, dynamic>> post(
       String endpoint, Map<String, dynamic> data) async {
     return _executeWithRetry(() async {
+      final normalizedEndpoint = _normalizeEndpoint(endpoint);
+      final fullUrl = '$baseUrl/$normalizedEndpoint';
+      print('🌐 POST Request: $fullUrl');
+      print('📦 Body: ${jsonEncode(data)}');
       final response = await client.post(
-        Uri.parse('$baseUrl/$endpoint'),
+        Uri.parse(fullUrl),
         headers: _jsonHeaders(),
         body: jsonEncode(data),
       );
@@ -144,8 +159,9 @@ class ApiServiceImpl implements IApiService {
   @override
   Future<Map<String, dynamic>> put(
       String endpoint, Map<String, dynamic> data) async {
+    final normalizedEndpoint = _normalizeEndpoint(endpoint);
     final response = await client.put(
-      Uri.parse('$baseUrl/$endpoint'),
+      Uri.parse('$baseUrl/$normalizedEndpoint'),
       headers: _jsonHeaders(),
       body: jsonEncode(data),
     );
@@ -163,8 +179,9 @@ class ApiServiceImpl implements IApiService {
   @override
   Future<void> delete(String endpoint) async {
     return _executeWithRetry(() async {
+      final normalizedEndpoint = _normalizeEndpoint(endpoint);
       final response = await client.delete(
-        Uri.parse('$baseUrl/$endpoint'),
+        Uri.parse('$baseUrl/$normalizedEndpoint'),
         headers: _jsonHeaders(),
       );
 
@@ -179,8 +196,9 @@ class ApiServiceImpl implements IApiService {
   // ----------------------------------------------------------
   Future<String> getRaw(String endpoint) async {
     return _executeWithRetry(() async {
+      final normalizedEndpoint = _normalizeEndpoint(endpoint);
       final response = await client.get(
-        Uri.parse('$baseUrl/$endpoint'),
+        Uri.parse('$baseUrl/$normalizedEndpoint'),
         headers: _jsonHeaders(),
       );
 

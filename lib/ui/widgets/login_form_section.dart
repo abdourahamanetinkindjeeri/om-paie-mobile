@@ -10,6 +10,7 @@ class LoginFormSection extends StatelessWidget {
   final TextEditingController phoneController;
   final PageController pageController;
   final VoidCallback onLoginPressed;
+  final ValueChanged<String>? onCountryCodeChanged;
 
   const LoginFormSection({
     Key? key,
@@ -17,6 +18,7 @@ class LoginFormSection extends StatelessWidget {
     required this.phoneController,
     required this.pageController,
     required this.onLoginPressed,
+    this.onCountryCodeChanged,
   }) : super(key: key);
 
   @override
@@ -59,7 +61,10 @@ class LoginFormSection extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 28),
-              PhoneInputRow(controller: phoneController),
+              PhoneInputRow(
+                controller: phoneController,
+                onCountryCodeChanged: onCountryCodeChanged,
+              ),
               const SizedBox(height: 24),
               LoginButton(
                 onPressed: onLoginPressed,
