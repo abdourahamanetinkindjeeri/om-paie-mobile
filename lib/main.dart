@@ -21,10 +21,15 @@ void main() async {
   final tokenManager = TokenManagerMobile();
   await tokenManager.loadTokens();
 
+  // final apiService = ApiServiceImpl(
+  //   Config.apiBaseUrl,
+  //   tokenManager: tokenManager,
+  //   client: http.Client(),
+  // );
+
   final apiService = ApiServiceImpl(
-    Config.apiBaseUrl,
+    "http://localhost:8000/api",
     tokenManager: tokenManager,
-    client: http.Client(),
   );
 
   final authService = AuthService(apiService);

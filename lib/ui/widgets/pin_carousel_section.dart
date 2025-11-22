@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/ui/screen/custom.clip_path.dart';
-import 'package:om_paie_flutter/ui/screen/custom.clip_path.dart';
 
 class PinCarouselSection extends StatelessWidget {
   const PinCarouselSection({Key? key}) : super(key: key);
