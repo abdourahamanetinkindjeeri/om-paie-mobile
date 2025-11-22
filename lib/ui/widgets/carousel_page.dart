@@ -16,7 +16,6 @@ class CarouselPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
       child: Stack(
         children: <Widget>[
           Positioned.fill(
@@ -63,7 +62,7 @@ class CarouselPage extends StatelessWidget {
             ),
           ),
           Positioned(
-            top: 30,
+            top: 0,
             left: 20,
             right: 20,
             child: Column(

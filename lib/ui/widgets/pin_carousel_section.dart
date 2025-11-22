@@ -11,7 +11,6 @@ class PinCarouselSection extends StatelessWidget {
     return Expanded(
       flex: 6,
       child: Container(
-        margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
         child: Stack(
           children: [
             Positioned.fill(

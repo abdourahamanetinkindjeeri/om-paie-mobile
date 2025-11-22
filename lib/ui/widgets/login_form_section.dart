@@ -62,7 +62,7 @@ class LoginFormSection extends StatelessWidget {
               PhoneInputRow(controller: phoneController),
               const SizedBox(height: 24),
               LoginButton(
-                onPressed: phoneController.text.isNotEmpty ? onLoginPressed : null,
+                onPressed: onLoginPressed,
               ),
               const SizedBox(height: 18),
               Text(
