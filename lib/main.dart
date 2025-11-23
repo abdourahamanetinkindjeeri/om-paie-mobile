@@ -6,6 +6,7 @@ import 'package:om_paie_flutter/core/config.dart';
 import 'package:om_paie_flutter/core/data/services/api.service.impl.dart';
 import 'package:om_paie_flutter/features/auth/auth.service.dart';
 import 'package:om_paie_flutter/features/auth/token_manager_mobile.dart';
+import 'package:om_paie_flutter/ui/screen/dashboard_screen.dart';
 import 'package:om_paie_flutter/ui/widgets/carousel_section.dart';
 import 'package:om_paie_flutter/ui/widgets/login_form_section.dart';
 import 'package:om_paie_flutter/ui/widgets/pin_carousel_section.dart';
@@ -63,6 +64,12 @@ class OrangeMoneyApp extends StatelessWidget {
         authService: authService,
         tokenManager: tokenManager,
       ),
+      routes: {
+        '/dashboard': (context) => DashboardScreen(
+              authService: authService,
+              tokenManager: tokenManager,
+            ),
+      },
     );
   }
 }

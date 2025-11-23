@@ -4,6 +4,7 @@ import 'package:om_paie_flutter/constants/app_strings.dart';
 import 'package:om_paie_flutter/features/auth/auth.service.dart';
 import 'package:om_paie_flutter/features/auth/itoken_manager.dart';
 import 'package:om_paie_flutter/ui/screen/otp_screen.dart';
+import 'package:om_paie_flutter/ui/screen/dashboard_screen.dart';
 
 class PinFormSection extends StatefulWidget {
   final String phoneNumber;
@@ -135,8 +136,15 @@ class _PinFormSectionState extends State<PinFormSection> {
             backgroundColor: AppColors.primary,
           ),
         );
-        // Naviguer vers l'écran suivant
-        Navigator.of(context).pushReplacementNamed('/home'); // Ajuster selon l'écran suivant
+        // Naviguer vers le dashboard
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => DashboardScreen(
+              authService: widget.authService,
+              tokenManager: widget.tokenManager,
+            ),
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
