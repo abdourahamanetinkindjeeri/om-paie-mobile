@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 
-class DashboardHeader extends StatelessWidget {
+class DashboardHeader extends StatefulWidget {
   final Map<String, dynamic>? userProfile;
   final List<Map<String, dynamic>> comptes;
   final VoidCallback onMenuPressed;
@@ -14,10 +14,18 @@ class DashboardHeader extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<DashboardHeader> createState() => _DashboardHeaderState();
+}
+
+class _DashboardHeaderState extends State<DashboardHeader> {
+  bool _isBalanceVisible = true;
+
+  @override
   Widget build(BuildContext context) {
-    final userName = '${userProfile?['prenom'] ?? ''} ${userProfile?['nom'] ?? 'Utilisateur'}'.trim();
-    final balance = comptes.isNotEmpty ? comptes[0]['solde']?.toString() ?? '0' : '0';
-    final devise = comptes.isNotEmpty ? comptes[0]['devise'] ?? 'CFA' : 'CFA';
+    final userName = '${widget.userProfile?['prenom'] ?? ''} ${widget.userProfile?['nom'] ?? 'Utilisateur'}'.trim();
+    final balance = widget.comptes.isNotEmpty ? widget.comptes[0]['solde']?.toString() ?? '0' : '0';
+    final devise = widget.comptes.isNotEmpty ? widget.comptes[0]['devise'] ?? 'CFA' : 'CFA';
+    final displayBalance = _isBalanceVisible ? '$balance $devise' : '****';
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -33,7 +41,7 @@ class DashboardHeader extends StatelessWidget {
               Row(
                 children: [
                   GestureDetector(
-                    onTap: onMenuPressed,
+                    onTap: widget.onMenuPressed,
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       child: const Icon(
@@ -70,12 +78,27 @@ class DashboardHeader extends StatelessWidget {
                       Row(
                         children: [
                           Text(
-                            'Solde: $balance $devise',
+                            'Solde: $displayBalance',
                             style: const TextStyle(
                               color: AppColors.textSecondary,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _isBalanceVisible = !_isBalanceVisible;
+                              });
+                            },
+                            icon: Icon(
+                              _isBalanceVisible ? Icons.visibility : Icons.visibility_off,
+                              color: AppColors.textSecondary,
+                              size: 16,
+                            ),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
                           ),
                         ],
                       ),
