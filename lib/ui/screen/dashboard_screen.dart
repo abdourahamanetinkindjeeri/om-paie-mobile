@@ -24,6 +24,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Map<String, dynamic>? _userProfile;
   List<Map<String, dynamic>> _comptes = [];
   List<Map<String, dynamic>> _historiqueTransactions = [];
+  Map<String, dynamic>? _qrCode;
   bool _isLoading = true;
 
   @override
@@ -40,6 +41,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _userProfile = profile['user'];
           _comptes = List<Map<String, dynamic>>.from(profile['comptes'] ?? []);
           _historiqueTransactions = List<Map<String, dynamic>>.from(profile['historique_transactions'] ?? []);
+          _qrCode = profile['qr_code'];
           _isLoading = false;
         });
       }
@@ -79,6 +81,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             DashboardHeader(
               userProfile: _userProfile,
               comptes: _comptes,
+              qrCode: _qrCode,
               onMenuPressed: () {
                 // Ouvrir le menu latéral
                 _showMenuDrawer();

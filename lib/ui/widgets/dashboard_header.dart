@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class DashboardHeader extends StatefulWidget {
   final Map<String, dynamic>? userProfile;
   final List<Map<String, dynamic>> comptes;
+  final Map<String, dynamic>? qrCode;
   final VoidCallback onMenuPressed;
 
   const DashboardHeader({
     Key? key,
     this.userProfile,
     this.comptes = const [],
+    this.qrCode,
     required this.onMenuPressed,
   }) : super(key: key);
 
@@ -112,22 +115,56 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                   border: Border.all(color: AppColors.textPrimary, width: 2),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Image.network(
-                  'https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=OM_PAY_${userName.hashCode}',
-                  width: 80,
-                  height: 80,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      width: 80,
-                      height: 80,
-                      color: AppColors.surface,
-                      child: const Icon(
-                        Icons.qr_code,
-                        color: AppColors.textPrimary,
-                        size: 40,
-                      ),
-                    );
-                  },
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.border, width: 1),
+                  ),
+                  child: Builder(
+                    builder: (context) {
+                      // Récupérer la chaîne QR correctement
+                      String qrData;
+                      if (widget.qrCode != null && widget.qrCode!['qr_string'] != null) {
+                        qrData = widget.qrCode!['qr_string'] as String;
+                      } else {
+                        // Générer un QR code de secours avec les données de l'utilisateur
+                        qrData = '{"user_id":"${userName.hashCode}","telephone":"","nom_complet":"$userName","type":"om_paie_user"}';
+                      }
+                      
+                      return QrImageView(
+                        data: qrData,
+                        version: QrVersions.auto,
+                        size: 88.0,
+                        gapless: true,
+                        dataModuleStyle: const QrDataModuleStyle(
+                          dataModuleShape: QrDataModuleShape.square,
+                          color: Colors.black,
+                        ),
+                        eyeStyle: const QrEyeStyle(
+                          eyeShape: QrEyeShape.square,
+                          color: Colors.black,
+                        ),
+                        backgroundColor: Colors.white,
+                        errorCorrectionLevel: QrErrorCorrectLevel.H,
+                        errorStateBuilder: (cxt, err) {
+                          return Container(
+                            width: 88,
+                            height: 88,
+                            color: AppColors.surface,
+                            child: const Icon(
+                              Icons.qr_code,
+                              color: AppColors.textPrimary,
+                              size: 44,
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
             ],
