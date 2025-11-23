@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 
 class PaymentSection extends StatefulWidget {
-  final Function(String amount, String recipient) onPayPressed;
-  final Function(String amount, String recipient) onTransferPressed;
+  final Future<void> Function(String amount, String recipient) onPayPressed;
+  final Future<void> Function(String amount, String recipient)
+      onTransferPressed;
 
   const PaymentSection({
     Key? key,
@@ -46,12 +47,15 @@ class _PaymentSectionState extends State<PaymentSection> {
                   onTap: () {
                     setState(() {
                       _isPaymentSelected = true;
+                      _recipientController.clear();
                     });
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      color: _isPaymentSelected ? AppColors.primary : Colors.transparent,
+                      color: _isPaymentSelected
+                          ? AppColors.primary
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -59,16 +63,22 @@ class _PaymentSectionState extends State<PaymentSection> {
                       children: [
                         Icon(
                           Icons.radio_button_checked,
-                          color: _isPaymentSelected ? Colors.white : AppColors.textSecondary,
+                          color: _isPaymentSelected
+                              ? Colors.white
+                              : AppColors.textSecondary,
                           size: 20,
                         ),
                         const SizedBox(width: 8),
                         Text(
                           'Payer',
                           style: TextStyle(
-                            color: _isPaymentSelected ? Colors.white : AppColors.textSecondary,
+                            color: _isPaymentSelected
+                                ? Colors.white
+                                : AppColors.textSecondary,
                             fontSize: 16,
-                            fontWeight: _isPaymentSelected ? FontWeight.bold : FontWeight.normal,
+                            fontWeight: _isPaymentSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                           ),
                         ),
                       ],
@@ -82,29 +92,38 @@ class _PaymentSectionState extends State<PaymentSection> {
                   onTap: () {
                     setState(() {
                       _isPaymentSelected = false;
+                      _recipientController.clear();
                     });
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      color: !_isPaymentSelected ? AppColors.primary : Colors.transparent,
+                      color: !_isPaymentSelected
+                          ? AppColors.primary
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          Icons.radio_button_unchecked,
-                          color: !_isPaymentSelected ? Colors.white : AppColors.textSecondary,
+                          Icons.radio_button_checked,
+                          color: !_isPaymentSelected
+                              ? Colors.white
+                              : AppColors.textSecondary,
                           size: 20,
                         ),
                         const SizedBox(width: 8),
                         Text(
                           'Transférer',
                           style: TextStyle(
-                            color: !_isPaymentSelected ? Colors.white : AppColors.textSecondary,
+                            color: !_isPaymentSelected
+                                ? Colors.white
+                                : AppColors.textSecondary,
                             fontSize: 16,
-                            fontWeight: !_isPaymentSelected ? FontWeight.bold : FontWeight.normal,
+                            fontWeight: !_isPaymentSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                           ),
                         ),
                       ],
@@ -133,7 +152,9 @@ class _PaymentSectionState extends State<PaymentSection> {
             controller: _recipientController,
             style: const TextStyle(color: AppColors.textPrimary),
             decoration: InputDecoration(
-              hintText: 'Saisir le numéro/code marchand',
+              hintText: _isPaymentSelected
+                  ? 'Saisir le code marchand'
+                  : 'Saisir le numéro de téléphone',
               hintStyle: const TextStyle(color: AppColors.textSecondary),
               filled: true,
               fillColor: AppColors.background,
@@ -141,7 +162,8 @@ class _PaymentSectionState extends State<PaymentSection> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             ),
           ),
           const SizedBox(height: 12),
@@ -159,7 +181,8 @@ class _PaymentSectionState extends State<PaymentSection> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             ),
           ),
           const SizedBox(height: 20),
@@ -168,11 +191,14 @@ class _PaymentSectionState extends State<PaymentSection> {
             width: double.infinity,
             child: ElevatedButton(
               onPressed: () {
-                if (_recipientController.text.isNotEmpty && _amountController.text.isNotEmpty) {
+                if (_recipientController.text.isNotEmpty &&
+                    _amountController.text.isNotEmpty) {
                   if (_isPaymentSelected) {
-                    widget.onPayPressed(_amountController.text, _recipientController.text);
+                    widget.onPayPressed(
+                        _amountController.text, _recipientController.text);
                   } else {
-                    widget.onTransferPressed(_amountController.text, _recipientController.text);
+                    widget.onTransferPressed(
+                        _amountController.text, _recipientController.text);
                   }
                   _recipientController.clear();
                   _amountController.clear();

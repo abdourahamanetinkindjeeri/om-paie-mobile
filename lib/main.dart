@@ -6,6 +6,7 @@ import 'package:om_paie_flutter/core/config.dart';
 import 'package:om_paie_flutter/core/data/services/api.service.impl.dart';
 import 'package:om_paie_flutter/features/auth/auth.service.dart';
 import 'package:om_paie_flutter/features/auth/token_manager_mobile.dart';
+import 'package:om_paie_flutter/features/comptes/compte.service.dart';
 import 'package:om_paie_flutter/ui/screen/dashboard_screen.dart';
 import 'package:om_paie_flutter/ui/widgets/carousel_section.dart';
 import 'package:om_paie_flutter/ui/widgets/login_form_section.dart';
@@ -34,21 +35,25 @@ void main() async {
   // );
 
   final authService = AuthService(apiService);
+  final compteService = CompteService(apiService);
 
   runApp(OrangeMoneyApp(
     authService: authService,
     tokenManager: tokenManager,
+    compteService: compteService,
   ));
 }
 
 class OrangeMoneyApp extends StatelessWidget {
   final AuthService authService;
   final TokenManagerMobile tokenManager;
+  final CompteService compteService;
 
   const OrangeMoneyApp({
     Key? key,
     required this.authService,
     required this.tokenManager,
+    required this.compteService,
   }) : super(key: key);
 
   @override
@@ -63,11 +68,13 @@ class OrangeMoneyApp extends StatelessWidget {
       home: LoginScreen(
         authService: authService,
         tokenManager: tokenManager,
+        compteService: compteService,
       ),
       routes: {
         '/dashboard': (context) => DashboardScreen(
               authService: authService,
               tokenManager: tokenManager,
+              compteService: compteService,
             ),
       },
     );
@@ -77,11 +84,13 @@ class OrangeMoneyApp extends StatelessWidget {
 class LoginScreen extends StatefulWidget {
   final AuthService authService;
   final TokenManagerMobile tokenManager;
+  final CompteService compteService;
 
   const LoginScreen({
     Key? key,
     required this.authService,
     required this.tokenManager,
+    required this.compteService,
   }) : super(key: key);
 
   @override
@@ -136,6 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       phoneNumber: fullPhoneNumber,
                       authService: widget.authService,
                       tokenManager: widget.tokenManager,
+                      compteService: widget.compteService,
                     ),
                   ),
                 );
@@ -153,12 +163,14 @@ class PinCodeScreen extends StatefulWidget {
   final String phoneNumber;
   final AuthService authService;
   final TokenManagerMobile tokenManager;
+  final CompteService compteService;
 
   const PinCodeScreen({
     Key? key,
     required this.phoneNumber,
     required this.authService,
     required this.tokenManager,
+    required this.compteService,
   }) : super(key: key);
 
   @override
@@ -177,6 +189,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
             phoneNumber: widget.phoneNumber,
             authService: widget.authService,
             tokenManager: widget.tokenManager,
+            compteService: widget.compteService,
           ),
         ],
       ),

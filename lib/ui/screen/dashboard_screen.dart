@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/features/auth/auth.service.dart';
 import 'package:om_paie_flutter/features/auth/itoken_manager.dart';
+import 'package:om_paie_flutter/features/comptes/compte.service.dart';
 import 'package:om_paie_flutter/ui/widgets/dashboard_header.dart';
 import 'package:om_paie_flutter/ui/widgets/payment_section.dart';
 import 'package:om_paie_flutter/ui/widgets/transaction_history.dart';
@@ -9,11 +10,13 @@ import 'package:om_paie_flutter/ui/widgets/transaction_history.dart';
 class DashboardScreen extends StatefulWidget {
   final AuthService authService;
   final ITokenManager tokenManager;
+  final CompteService compteService;
 
   const DashboardScreen({
     Key? key,
     required this.authService,
     required this.tokenManager,
+    required this.compteService,
   }) : super(key: key);
 
   @override
@@ -40,7 +43,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         setState(() {
           _userProfile = profile['user'];
           _comptes = List<Map<String, dynamic>>.from(profile['comptes'] ?? []);
-          _historiqueTransactions = List<Map<String, dynamic>>.from(profile['historique_transactions'] ?? []);
+          _historiqueTransactions = List<Map<String, dynamic>>.from(
+              profile['historique_transactions'] ?? []);
           _qrCode = profile['qr_code'];
           _isLoading = false;
         });
@@ -58,6 +62,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
         );
       }
     }
+  }
+
+  String? _getPrincipalAccountId() {
+    // Vérifier d'abord les comptes avec type 'principal'
+    for (final compte in _comptes) {
+      if (compte['type'] == 'principal' && compte['numero_compte'] != null) {
+        return compte['numero_compte'] as String;
+      }
+    }
+    // Sinon, chercher le premier compte disponible
+    for (final compte in _comptes) {
+      final numeroCompte = compte['numero_compte'];
+      if (numeroCompte != null) {
+        return numeroCompte as String;
+      }
+    }
+    return null;
   }
 
   @override
@@ -92,11 +113,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Column(
                   children: [
                     PaymentSection(
-                      onPayPressed: (amount, recipient) {
-                        _handlePayment(amount, recipient);
+                      onPayPressed: (amount, recipient) async {
+                        await _handlePayment(amount, recipient);
                       },
-                      onTransferPressed: (amount, recipient) {
-                        _handleTransfer(amount, recipient);
+                      onTransferPressed: (amount, recipient) async {
+                        await _handleTransfer(amount, recipient);
                       },
                     ),
                     const SizedBox(height: 20),
@@ -129,7 +150,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.person, color: AppColors.primary),
-                title: const Text('Mon profil', style: TextStyle(color: AppColors.textPrimary)),
+                title: const Text('Mon profil',
+                    style: TextStyle(color: AppColors.textPrimary)),
                 onTap: () {
                   Navigator.pop(context);
                   // Naviguer vers le profil
@@ -137,7 +159,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.settings, color: AppColors.primary),
-                title: const Text('Paramètres', style: TextStyle(color: AppColors.textPrimary)),
+                title: const Text('Paramètres',
+                    style: TextStyle(color: AppColors.textPrimary)),
                 onTap: () {
                   Navigator.pop(context);
                   // Naviguer vers les paramètres
@@ -145,7 +168,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.help, color: AppColors.primary),
-                title: const Text('Aide', style: TextStyle(color: AppColors.textPrimary)),
+                title: const Text('Aide',
+                    style: TextStyle(color: AppColors.textPrimary)),
                 onTap: () {
                   Navigator.pop(context);
                   // Naviguer vers l'aide
@@ -154,7 +178,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const Divider(color: AppColors.border),
               ListTile(
                 leading: const Icon(Icons.logout, color: Colors.red),
-                title: const Text('Déconnexion', style: TextStyle(color: Colors.red)),
+                title: const Text('Déconnexion',
+                    style: TextStyle(color: Colors.red)),
                 onTap: () {
                   Navigator.pop(context);
                   _handleLogout();
@@ -167,24 +192,98 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  void _handlePayment(String amount, String recipient) {
-    // Logique de paiement
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Paiement de $amount CFA vers $recipient'),
-        backgroundColor: AppColors.primary,
-      ),
-    );
+  Future<void> _handlePayment(String amount, String recipient) async {
+    final principalAccountId = _getPrincipalAccountId();
+    if (principalAccountId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Aucun compte principal trouvé'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      final response = await widget.compteService.payement(
+        numeroCompte: principalAccountId,
+        codeMerchant: recipient,
+        montant: int.parse(amount),
+      );
+
+      if (response['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Paiement effectué avec succès'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Refresh profile to update balance
+        _loadUserProfile();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('Erreur: ${response['message'] ?? 'Paiement échoué'}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors du paiement: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
-  void _handleTransfer(String amount, String recipient) {
-    // Logique de transfert
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Transfert de $amount CFA vers $recipient'),
-        backgroundColor: AppColors.primary,
-      ),
-    );
+  Future<void> _handleTransfer(String amount, String recipient) async {
+    final principalAccountId = _getPrincipalAccountId();
+    if (principalAccountId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Aucun compte principal trouvé'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    try {
+      final response = await widget.compteService.transfer(
+        numeroCompte: principalAccountId,
+        telephoneDestinataire: recipient,
+        montant: int.parse(amount),
+      );
+
+      if (response['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Transfert effectué avec succès'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Refresh profile to update balance
+        _loadUserProfile();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content:
+                Text('Erreur: ${response['message'] ?? 'Transfert échoué'}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Erreur lors du transfert: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Future<void> _handleLogout() async {

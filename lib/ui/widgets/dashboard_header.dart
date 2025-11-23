@@ -124,44 +124,31 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: AppColors.border, width: 1),
                   ),
-                  child: Builder(
-                    builder: (context) {
-                      // Récupérer la chaîne QR correctement
-                      String qrData;
-                      if (widget.qrCode != null && widget.qrCode!['qr_string'] != null) {
-                        qrData = widget.qrCode!['qr_string'] as String;
-                      } else {
-                        // Générer un QR code de secours avec les données de l'utilisateur
-                        qrData = '{"user_id":"${userName.hashCode}","telephone":"","nom_complet":"$userName","type":"om_paie_user"}';
-                      }
-                      
-                      return QrImageView(
-                        data: qrData,
-                        version: QrVersions.auto,
-                        size: 88.0,
-                        gapless: true,
-                        dataModuleStyle: const QrDataModuleStyle(
-                          dataModuleShape: QrDataModuleShape.square,
-                          color: Colors.black,
+                  child: QrImageView(
+                    data: widget.qrCode?['qr_string'] ?? 'OM_PAY_${userName.hashCode}',
+                    version: 5, // Version fixe pour une meilleure compatibilité
+                    size: 88.0,
+                    gapless: true,
+                    dataModuleStyle: const QrDataModuleStyle(
+                      dataModuleShape: QrDataModuleShape.square,
+                      color: Colors.black,
+                    ),
+                    eyeStyle: const QrEyeStyle(
+                      eyeShape: QrEyeShape.square,
+                      color: Colors.black,
+                    ),
+                    backgroundColor: Colors.white,
+                    errorCorrectionLevel: QrErrorCorrectLevel.M, // Niveau de correction d'erreur moyen
+                    errorStateBuilder: (cxt, err) {
+                      return Container(
+                        width: 88,
+                        height: 88,
+                        color: AppColors.surface,
+                        child: const Icon(
+                          Icons.qr_code,
+                          color: AppColors.textPrimary,
+                          size: 44,
                         ),
-                        eyeStyle: const QrEyeStyle(
-                          eyeShape: QrEyeShape.square,
-                          color: Colors.black,
-                        ),
-                        backgroundColor: Colors.white,
-                        errorCorrectionLevel: QrErrorCorrectLevel.H,
-                        errorStateBuilder: (cxt, err) {
-                          return Container(
-                            width: 88,
-                            height: 88,
-                            color: AppColors.surface,
-                            child: const Icon(
-                              Icons.qr_code,
-                              color: AppColors.textPrimary,
-                              size: 44,
-                            ),
-                          );
-                        },
                       );
                     },
                   ),

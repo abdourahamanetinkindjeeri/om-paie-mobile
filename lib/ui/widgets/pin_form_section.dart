@@ -3,6 +3,7 @@ import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/constants/app_strings.dart';
 import 'package:om_paie_flutter/features/auth/auth.service.dart';
 import 'package:om_paie_flutter/features/auth/itoken_manager.dart';
+import 'package:om_paie_flutter/features/comptes/compte.service.dart';
 import 'package:om_paie_flutter/ui/screen/otp_screen.dart';
 import 'package:om_paie_flutter/ui/screen/dashboard_screen.dart';
 
@@ -10,12 +11,14 @@ class PinFormSection extends StatefulWidget {
   final String phoneNumber;
   final AuthService authService;
   final ITokenManager tokenManager;
+  final CompteService compteService;
 
   const PinFormSection({
     Key? key,
     required this.phoneNumber,
     required this.authService,
     required this.tokenManager,
+    required this.compteService,
   }) : super(key: key);
 
   @override
@@ -142,6 +145,7 @@ class _PinFormSectionState extends State<PinFormSection> {
             builder: (context) => DashboardScreen(
               authService: widget.authService,
               tokenManager: widget.tokenManager,
+              compteService: widget.compteService,
             ),
           ),
         );
@@ -166,6 +170,7 @@ class _PinFormSectionState extends State<PinFormSection> {
           phoneNumber: widget.phoneNumber,
           authService: widget.authService,
           tokenManager: widget.tokenManager,
+          compteService: widget.compteService,
         ),
       ),
     );

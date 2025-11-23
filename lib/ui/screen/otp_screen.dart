@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/features/auth/auth.service.dart';
 import 'package:om_paie_flutter/features/auth/itoken_manager.dart';
+import 'package:om_paie_flutter/features/comptes/compte.service.dart';
 import 'package:om_paie_flutter/ui/widgets/otp_form_section.dart';
 import 'package:om_paie_flutter/ui/widgets/pin_carousel_section.dart';
 
@@ -10,12 +11,14 @@ class OtpScreen extends StatefulWidget {
   final String phoneNumber;
   final AuthService authService;
   final ITokenManager tokenManager;
+  final CompteService compteService;
 
   const OtpScreen({
     Key? key,
     required this.phoneNumber,
     required this.authService,
     required this.tokenManager,
+    required this.compteService,
   }) : super(key: key);
 
   @override
@@ -34,6 +37,7 @@ class _OtpScreenState extends State<OtpScreen> {
             phoneNumber: widget.phoneNumber,
             authService: widget.authService,
             tokenManager: widget.tokenManager,
+            compteService: widget.compteService,
           ),
         ],
       ),
