@@ -121,25 +121,18 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.all(6),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   border: Border.all(color: AppColors.textPrimary, width: 2),
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Container(
-                  width: 70,
-                  height: 70,
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: AppColors.border, width: 1),
-                  ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
                   child: QrImageView(
                     data: widget.qrCode?['qr_string'] ??
                         'OM_PAY_${userName.hashCode}',
-                    version: 5, // Version fixe pour une meilleure compatibilité
-                    size: 62.0,
+                    version: 5,
+                    size: 90,
                     gapless: true,
                     dataModuleStyle: const QrDataModuleStyle(
                       dataModuleShape: QrDataModuleShape.square,
@@ -150,17 +143,16 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                       color: Colors.black,
                     ),
                     backgroundColor: Colors.white,
-                    errorCorrectionLevel: QrErrorCorrectLevel
-                        .M, // Niveau de correction d'erreur moyen
+                    errorCorrectionLevel: QrErrorCorrectLevel.M,
                     errorStateBuilder: (cxt, err) {
                       return Container(
-                        width: 62,
-                        height: 62,
+                        width: 90,
+                        height: 90,
                         color: AppColors.surface,
                         child: const Icon(
                           Icons.qr_code,
                           color: AppColors.textPrimary,
-                          size: 30,
+                          size: 50,
                         ),
                       );
                     },
