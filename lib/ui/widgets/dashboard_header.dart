@@ -25,9 +25,15 @@ class _DashboardHeaderState extends State<DashboardHeader> {
 
   @override
   Widget build(BuildContext context) {
-    final userName = '${widget.userProfile?['prenom'] ?? ''} ${widget.userProfile?['nom'] ?? 'Utilisateur'}'.trim();
-    final balance = widget.comptes.isNotEmpty ? widget.comptes[0]['solde']?.toString() ?? '0' : '0';
-    final devise = widget.comptes.isNotEmpty ? widget.comptes[0]['devise'] ?? 'CFA' : 'CFA';
+    final userName =
+        '${widget.userProfile?['prenom'] ?? ''} ${widget.userProfile?['nom'] ?? 'Utilisateur'}'
+            .trim();
+    final balance = widget.comptes.isNotEmpty
+        ? widget.comptes[0]['solde']?.toString() ?? '0'
+        : '0';
+    final devise = widget.comptes.isNotEmpty
+        ? widget.comptes[0]['devise'] ?? 'CFA'
+        : 'CFA';
     final displayBalance = _isBalanceVisible ? '$balance $devise' : '****';
 
     return Container(
@@ -41,28 +47,28 @@ class _DashboardHeaderState extends State<DashboardHeader> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: widget.onMenuPressed,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      child: const Icon(
-                        Icons.menu,
-                        color: AppColors.textPrimary,
-                        size: 28,
+              Expanded(
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: widget.onMenuPressed,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(
+                          Icons.menu,
+                          color: AppColors.textPrimary,
+                          size: 28,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Bonjour ',
-                            style: const TextStyle(
+                          const Text(
+                            'Bonjour',
+                            style: TextStyle(
                               color: AppColors.textPrimary,
                               fontSize: 18,
                               fontWeight: FontWeight.normal,
@@ -75,79 +81,86 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Text(
+                                displayBalance,
+                                style: const TextStyle(
+                                  color: AppColors.primary,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _isBalanceVisible = !_isBalanceVisible;
+                                  });
+                                },
+                                icon: Icon(
+                                  _isBalanceVisible
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  color: AppColors.textSecondary,
+                                  size: 16,
+                                ),
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                      Row(
-                        children: [
-                          Text(
-                            'Solde: $displayBalance',
-                            style: const TextStyle(
-                              color: AppColors.textSecondary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          IconButton(
-                            onPressed: () {
-                              setState(() {
-                                _isBalanceVisible = !_isBalanceVisible;
-                              });
-                            },
-                            icon: Icon(
-                              _isBalanceVisible ? Icons.visibility : Icons.visibility_off,
-                              color: AppColors.textSecondary,
-                              size: 16,
-                            ),
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   border: Border.all(color: AppColors.textPrimary, width: 2),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: Container(
-                  width: 100,
-                  height: 100,
-                  padding: const EdgeInsets.all(6),
+                  width: 70,
+                  height: 70,
+                  padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(4),
                     border: Border.all(color: AppColors.border, width: 1),
                   ),
                   child: QrImageView(
-                    data: widget.qrCode?['qr_string'] ?? 'OM_PAY_${userName.hashCode}',
+                    data: widget.qrCode?['qr_string'] ??
+                        'OM_PAY_${userName.hashCode}',
                     version: 5, // Version fixe pour une meilleure compatibilité
-                    size: 88.0,
+                    size: 62.0,
                     gapless: true,
                     dataModuleStyle: const QrDataModuleStyle(
                       dataModuleShape: QrDataModuleShape.square,
                       color: Colors.black,
                     ),
                     eyeStyle: const QrEyeStyle(
-                      eyeShape: QrEyeShape.square,
+                      eyeShape: QrEyeShape.circle,
                       color: Colors.black,
                     ),
                     backgroundColor: Colors.white,
-                    errorCorrectionLevel: QrErrorCorrectLevel.M, // Niveau de correction d'erreur moyen
+                    errorCorrectionLevel: QrErrorCorrectLevel
+                        .M, // Niveau de correction d'erreur moyen
                     errorStateBuilder: (cxt, err) {
                       return Container(
-                        width: 88,
-                        height: 88,
+                        width: 62,
+                        height: 62,
                         color: AppColors.surface,
                         child: const Icon(
                           Icons.qr_code,
                           color: AppColors.textPrimary,
-                          size: 44,
+                          size: 30,
                         ),
                       );
                     },

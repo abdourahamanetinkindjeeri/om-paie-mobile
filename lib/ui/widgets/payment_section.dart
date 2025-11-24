@@ -61,12 +61,21 @@ class _PaymentSectionState extends State<PaymentSection> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.radio_button_checked,
-                          color: _isPaymentSelected
-                              ? Colors.white
-                              : AppColors.textSecondary,
-                          size: 20,
+                        Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _isPaymentSelected
+                                ? Colors.white
+                                : Colors.transparent,
+                            border: Border.all(
+                              color: _isPaymentSelected
+                                  ? Colors.white
+                                  : AppColors.textSecondary,
+                              width: 2,
+                            ),
+                          ),
                         ),
                         const SizedBox(width: 8),
                         Text(
@@ -106,12 +115,21 @@ class _PaymentSectionState extends State<PaymentSection> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.radio_button_checked,
-                          color: !_isPaymentSelected
-                              ? Colors.white
-                              : AppColors.textSecondary,
-                          size: 20,
+                        Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: !_isPaymentSelected
+                                ? Colors.white
+                                : Colors.transparent,
+                            border: Border.all(
+                              color: !_isPaymentSelected
+                                  ? Colors.white
+                                  : AppColors.textSecondary,
+                              width: 2,
+                            ),
+                          ),
                         ),
                         const SizedBox(width: 8),
                         Text(
