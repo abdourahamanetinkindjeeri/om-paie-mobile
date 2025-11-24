@@ -73,7 +73,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -100,7 +100,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           Expanded(
             child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -118,28 +118,28 @@ class _TransactionHistoryState extends State<TransactionHistory> {
 
   Widget _buildTransactionItem(Map<String, dynamic> transaction) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: [
           // Icône
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
               color: AppColors.background,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
               _getTransactionIcon(transaction['type']),
               color: AppColors.textSecondary,
-              size: 24,
+              size: 20,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 10),
           // Détails de la transaction
           Expanded(
             child: Column(
@@ -149,16 +149,16 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                   transaction['title'],
                   style: const TextStyle(
                     color: AppColors.textPrimary,
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 2),
                 Text(
                   transaction['recipient'],
                   style: const TextStyle(
                     color: AppColors.textSecondary,
-                    fontSize: 12,
+                    fontSize: 11,
                   ),
                 ),
               ],
@@ -176,30 +176,30 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                       color: transaction['isPositive']
                           ? Colors.green
                           : AppColors.textPrimary,
-                      fontSize: 14,
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 6),
                   const Icon(
                     Icons.search,
                     color: AppColors.textSecondary,
-                    size: 16,
+                    size: 14,
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 3),
                   const Icon(
                     Icons.keyboard_arrow_down,
                     color: AppColors.textSecondary,
-                    size: 16,
+                    size: 14,
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 transaction['date'],
                 style: const TextStyle(
                   color: AppColors.textSecondary,
-                  fontSize: 12,
+                  fontSize: 11,
                 ),
               ),
             ],

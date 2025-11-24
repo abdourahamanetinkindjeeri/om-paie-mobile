@@ -31,8 +31,8 @@ class _PaymentSectionState extends State<PaymentSection> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
@@ -164,7 +164,7 @@ class _PaymentSectionState extends State<PaymentSection> {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           // Recipient input
           TextField(
             controller: _recipientController,
@@ -203,7 +203,7 @@ class _PaymentSectionState extends State<PaymentSection> {
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
           // Validate button
           SizedBox(
             width: double.infinity,
@@ -240,7 +240,7 @@ class _PaymentSectionState extends State<PaymentSection> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
           // Max it button
           Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -278,7 +278,7 @@ class _PaymentSectionState extends State<PaymentSection> {
               ],
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           const Text(
             'Pour toute autre opération',
             style: TextStyle(

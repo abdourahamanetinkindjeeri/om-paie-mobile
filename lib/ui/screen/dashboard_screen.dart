@@ -116,7 +116,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 await _handleTransfer(amount, recipient);
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 8),
             Expanded(
               child: TransactionHistory(
                 transactions: _historiqueTransactions,

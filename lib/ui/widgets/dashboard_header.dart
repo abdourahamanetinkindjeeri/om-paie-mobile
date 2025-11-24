@@ -37,7 +37,7 @@ class _DashboardHeaderState extends State<DashboardHeader> {
     final displayBalance = _isBalanceVisible ? '$balance $devise' : '****';
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
       decoration: const BoxDecoration(
         color: AppColors.background,
       ),
