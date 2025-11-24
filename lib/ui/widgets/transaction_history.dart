@@ -15,58 +15,60 @@ class TransactionHistory extends StatefulWidget {
 
 class _TransactionHistoryState extends State<TransactionHistory> {
   List<Map<String, dynamic>> get _transactions => widget.transactions.map((t) {
-    final type = t['type'] as String;
-    final montant = t['montant'] as int;
-    final direction = t['direction'] as String;
-    final dateTransaction = t['date_transaction'] as String;
-    final metadata = t['metadata'] as Map<String, dynamic>;
+        final type = t['type'] as String;
+        final montant = t['montant'] as int;
+        final direction = t['direction'] as String;
+        final dateTransaction = t['date_transaction'] as String;
+        final metadata = t['metadata'] as Map<String, dynamic>;
 
-    String title;
-    String recipient;
-    String amount;
-    bool isPositive;
+        String title;
+        String recipient;
+        String amount;
+        bool isPositive;
 
-    switch (type) {
-      case 'payment':
-        title = metadata['merchant_name'] ?? 'Paiement';
-        recipient = metadata['user_phone'] ?? '';
-        break;
-      case 'transfer':
-        title = 'Transfert';
-        recipient = direction == 'debit' ? metadata['receiver_number'] ?? '' : metadata['sender_number'] ?? '';
-        break;
-      case 'withdrawal':
-        title = metadata['description'] ?? 'Retrait';
-        recipient = 'Point de vente';
-        break;
-      default:
-        title = type;
-        recipient = '';
-    }
+        switch (type) {
+          case 'payment':
+            title = metadata['merchant_name'] ?? 'Paiement';
+            recipient = metadata['user_phone'] ?? '';
+            break;
+          case 'transfer':
+            title = 'Transfert';
+            recipient = direction == 'debit'
+                ? metadata['receiver_number'] ?? ''
+                : metadata['sender_number'] ?? '';
+            break;
+          case 'withdrawal':
+            title = metadata['description'] ?? 'Retrait';
+            recipient = 'Point de vente';
+            break;
+          default:
+            title = type;
+            recipient = '';
+        }
 
-    amount = direction == 'debit' ? '- $montant' : '+ $montant';
-    isPositive = direction == 'credit';
+        amount = direction == 'debit' ? '- $montant' : '+ $montant';
+        isPositive = direction == 'credit';
 
-    // Format date: from "2025-11-18 09:35:04" to "18/11 09:35"
-    String formattedDate;
-    final dateParts = dateTransaction.split(' ');
-    if (dateParts.length >= 2) {
-      final date = dateParts[0].split('-');
-      final time = dateParts[1].split(':');
-      formattedDate = '${date[2]}/${date[1]} ${time[0]}:${time[1]}';
-    } else {
-      formattedDate = dateTransaction;
-    }
+        // Format date: from "2025-11-18 09:35:04" to "18/11 09:35"
+        String formattedDate;
+        final dateParts = dateTransaction.split(' ');
+        if (dateParts.length >= 2) {
+          final date = dateParts[0].split('-');
+          final time = dateParts[1].split(':');
+          formattedDate = '${date[2]}/${date[1]} ${time[0]}:${time[1]}';
+        } else {
+          formattedDate = dateTransaction;
+        }
 
-    return {
-      'type': type,
-      'title': title,
-      'recipient': recipient,
-      'amount': amount,
-      'date': formattedDate,
-      'isPositive': isPositive,
-    };
-  }).toList();
+        return {
+          'type': type,
+          'title': title,
+          'recipient': recipient,
+          'amount': amount,
+          'date': formattedDate,
+          'isPositive': isPositive,
+        };
+      }).toList();
 
   @override
   Widget build(BuildContext context) {
@@ -99,14 +101,15 @@ class _TransactionHistoryState extends State<TransactionHistory> {
             ],
           ),
           const SizedBox(height: 10),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _transactions.length,
-            itemBuilder: (context, index) {
-              final transaction = _transactions[index];
-              return _buildTransactionItem(transaction);
-            },
+          Expanded(
+            child: ListView.builder(
+              physics: const AlwaysScrollableScrollPhysics(),
+              itemCount: _transactions.length,
+              itemBuilder: (context, index) {
+                final transaction = _transactions[index];
+                return _buildTransactionItem(transaction);
+              },
+            ),
           ),
         ],
       ),
@@ -170,7 +173,9 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                   Text(
                     '${transaction['amount']} CFA',
                     style: TextStyle(
-                      color: transaction['isPositive'] ? Colors.green : AppColors.textPrimary,
+                      color: transaction['isPositive']
+                          ? Colors.green
+                          : AppColors.textPrimary,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),

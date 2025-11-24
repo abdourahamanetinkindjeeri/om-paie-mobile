@@ -108,24 +108,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 _showMenuDrawer();
               },
             ),
+            PaymentSection(
+              onPayPressed: (amount, recipient) async {
+                await _handlePayment(amount, recipient);
+              },
+              onTransferPressed: (amount, recipient) async {
+                await _handleTransfer(amount, recipient);
+              },
+            ),
+            const SizedBox(height: 20),
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    PaymentSection(
-                      onPayPressed: (amount, recipient) async {
-                        await _handlePayment(amount, recipient);
-                      },
-                      onTransferPressed: (amount, recipient) async {
-                        await _handleTransfer(amount, recipient);
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    TransactionHistory(
-                      transactions: _historiqueTransactions,
-                    ),
-                  ],
-                ),
+              child: TransactionHistory(
+                transactions: _historiqueTransactions,
               ),
             ),
           ],

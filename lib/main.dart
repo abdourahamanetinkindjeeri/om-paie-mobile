@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/constants/app_strings.dart';
 import 'package:om_paie_flutter/core/config.dart';
 import 'package:om_paie_flutter/core/data/services/api.service.impl.dart';
+import 'package:om_paie_flutter/core/storage/storage_migration.dart';
 import 'package:om_paie_flutter/features/auth/auth.service.dart';
 import 'package:om_paie_flutter/features/auth/token_manager_mobile.dart';
 import 'package:om_paie_flutter/features/comptes/compte.service.dart';
-import 'package:om_paie_flutter/ui/screen/dashboard_screen.dart';
+import 'package:om_paie_flutter/providers/auth_provider.dart';
+import 'package:om_paie_flutter/providers/compte_provider.dart';
+import 'package:om_paie_flutter/routes/route.dart';
 import 'package:om_paie_flutter/ui/widgets/carousel_section.dart';
 import 'package:om_paie_flutter/ui/widgets/login_form_section.dart';
 import 'package:om_paie_flutter/ui/widgets/pin_carousel_section.dart';
@@ -19,6 +23,9 @@ void main() async {
   // Charger la configuration
   await Config.load();
 
+  // Migrer les données de SharedPreferences vers SecureStorage si nécessaire
+  await StorageMigration.migrateTokens();
+
   // Initialiser les services
   final tokenManager = TokenManagerMobile();
   await tokenManager.loadTokens();
@@ -29,32 +36,33 @@ void main() async {
     client: http.Client(),
   );
 
-  // final apiService = ApiServiceImpl(
-  //   "http://localhost:8000/api",
-  //   tokenManager: tokenManager,
-  // );
-
   final authService = AuthService(apiService);
   final compteService = CompteService(apiService);
 
-  runApp(OrangeMoneyApp(
-    authService: authService,
-    tokenManager: tokenManager,
-    compteService: compteService,
-  ));
+  runApp(
+    MultiProvider(
+      providers: [
+        // Provider pour l'authentification
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider(
+            authService: authService,
+            tokenManager: tokenManager,
+          ),
+        ),
+        // Provider pour les comptes
+        ChangeNotifierProvider(
+          create: (_) => CompteProvider(
+            compteService: compteService,
+          ),
+        ),
+      ],
+      child: const OrangeMoneyApp(),
+    ),
+  );
 }
 
 class OrangeMoneyApp extends StatelessWidget {
-  final AuthService authService;
-  final TokenManagerMobile tokenManager;
-  final CompteService compteService;
-
-  const OrangeMoneyApp({
-    Key? key,
-    required this.authService,
-    required this.tokenManager,
-    required this.compteService,
-  }) : super(key: key);
+  const OrangeMoneyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -65,33 +73,30 @@ class OrangeMoneyApp extends StatelessWidget {
         primaryColor: AppColors.primary,
         scaffoldBackgroundColor: Colors.black,
       ),
-      home: LoginScreen(
-        authService: authService,
-        tokenManager: tokenManager,
-        compteService: compteService,
-      ),
-      routes: {
-        '/dashboard': (context) => DashboardScreen(
-              authService: authService,
-              tokenManager: tokenManager,
-              compteService: compteService,
-            ),
+      initialRoute: AppRoutes.home,
+      onGenerateRoute: (settings) {
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final compteProvider =
+            Provider.of<CompteProvider>(context, listen: false);
+
+        return AppRoutes.onGenerateRoute(
+          settings,
+          authService: authProvider.authService,
+          tokenManager: authProvider.tokenManager,
+          compteService: compteProvider.compteService,
+        );
       },
+      routes: {
+        AppRoutes.home: (context) => const LoginScreen(),
+        AppRoutes.login: (context) => const LoginScreen(),
+      },
+      onUnknownRoute: (settings) => AppRoutes.onUnknownRoute(settings),
     );
   }
 }
 
 class LoginScreen extends StatefulWidget {
-  final AuthService authService;
-  final TokenManagerMobile tokenManager;
-  final CompteService compteService;
-
-  const LoginScreen({
-    Key? key,
-    required this.authService,
-    required this.tokenManager,
-    required this.compteService,
-  }) : super(key: key);
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -143,9 +148,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   MaterialPageRoute<PinCodeScreen>(
                     builder: (BuildContext context) => PinCodeScreen(
                       phoneNumber: fullPhoneNumber,
-                      authService: widget.authService,
-                      tokenManager: widget.tokenManager,
-                      compteService: widget.compteService,
                     ),
                   ),
                 );
@@ -161,16 +163,10 @@ class _LoginScreenState extends State<LoginScreen> {
 // Écran de saisie du code PIN à 4 chiffres
 class PinCodeScreen extends StatefulWidget {
   final String phoneNumber;
-  final AuthService authService;
-  final TokenManagerMobile tokenManager;
-  final CompteService compteService;
 
   const PinCodeScreen({
     Key? key,
     required this.phoneNumber,
-    required this.authService,
-    required this.tokenManager,
-    required this.compteService,
   }) : super(key: key);
 
   @override
@@ -187,9 +183,9 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
           const PinCarouselSection(),
           PinFormSection(
             phoneNumber: widget.phoneNumber,
-            authService: widget.authService,
-            tokenManager: widget.tokenManager,
-            compteService: widget.compteService,
+            authService: context.read<AuthProvider>().authService,
+            tokenManager: context.read<AuthProvider>().tokenManager,
+            compteService: context.read<CompteProvider>().compteService,
           ),
         ],
       ),
