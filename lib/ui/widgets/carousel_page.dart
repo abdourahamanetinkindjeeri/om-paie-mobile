@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/ui/screen/custom.clip_path.dart';
-import 'package:om_paie_flutter/ui/screen/custom.clip_path.dart';
 
 class CarouselPage extends StatelessWidget {
   final String title;
   final String description;
+  final String? imageUrl;
 
   const CarouselPage({
     Key? key,
     required this.title,
     required this.description,
+    this.imageUrl,
   }) : super(key: key);
 
   @override
@@ -30,14 +31,15 @@ class CarouselPage extends StatelessWidget {
                   fit: StackFit.expand,
                   children: <Widget>[
                     Image.network(
-                      'https://www.gstatic.com/flutter-onestack-prototype/genui/example_1.jpg',
+                      imageUrl ??
+                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYaVmgDJqa_YJGm1PkPHdjQEOxpl5b2lblbg&s',
                       fit: BoxFit.cover,
                       errorBuilder: (BuildContext context, Object error,
                           StackTrace? stackTrace) {
                         return Container(
                           color: Colors.grey[800],
                           child: const Icon(
-                            Icons.person,
+                            Icons.image,
                             size: 100,
                             color: Colors.grey,
                           ),

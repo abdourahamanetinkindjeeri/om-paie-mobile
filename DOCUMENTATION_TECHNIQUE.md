@@ -83,6 +83,7 @@ L'application suit une **architecture en couches** avec séparation des responsa
 L'application utilise **`shared_preferences`** pour la persistance des données sensibles.
 
 #### Dépendance
+
 ```yaml
 dependencies:
   shared_preferences: ^2.2.3
@@ -108,15 +109,16 @@ class TokenManagerMobile implements ITokenManager {
 
 #### Stratégie de cache
 
-| Donnée | Type | Durée de vie | Emplacement |
-|--------|------|--------------|-------------|
-| Access Token | String | 1 heure (configurable) | SharedPreferences + RAM |
-| Refresh Token | String | Jusqu'à déconnexion | SharedPreferences + RAM |
-| Token Expiry | DateTime | Jusqu'à déconnexion | SharedPreferences + RAM |
+| Donnée        | Type     | Durée de vie           | Emplacement             |
+| ------------- | -------- | ---------------------- | ----------------------- |
+| Access Token  | String   | 1 heure (configurable) | SharedPreferences + RAM |
+| Refresh Token | String   | Jusqu'à déconnexion    | SharedPreferences + RAM |
+| Token Expiry  | DateTime | Jusqu'à déconnexion    | SharedPreferences + RAM |
 
 #### Opérations de cache
 
 ##### 📥 Sauvegarde des tokens
+
 ```dart
 Future<void> setTokens({
   required String accessToken,
@@ -137,14 +139,15 @@ Future<void> setTokens({
 ```
 
 ##### 📤 Chargement des tokens (au démarrage)
+
 ```dart
 Future<void> loadTokens() async {
   final prefs = await SharedPreferences.getInstance();
-  
+
   // Restauration depuis le cache disque
   _accessToken = prefs.getString(_accessTokenKey);
   _refreshToken = prefs.getString(_refreshTokenKey);
-  
+
   final expiryString = prefs.getString(_accessTokenExpiryKey);
   if (expiryString != null) {
     _accessTokenExpiry = DateTime.parse(expiryString);
@@ -153,6 +156,7 @@ Future<void> loadTokens() async {
 ```
 
 ##### 🗑️ Suppression des tokens (déconnexion)
+
 ```dart
 Future<void> clearTokens() async {
   // 1. Nettoyage mémoire
@@ -215,7 +219,7 @@ void main() async {
 ✅ **Double niveau de cache** : Mémoire (rapide) + Disque (persistant)  
 ✅ **Pas de re-login** : Les tokens persistent entre les sessions  
 ✅ **Sécurisé** : SharedPreferences chiffré sur iOS/Android  
-✅ **Léger** : Pas de base de données lourde pour des données simples  
+✅ **Léger** : Pas de base de données lourde pour des données simples
 
 ---
 
@@ -236,6 +240,7 @@ Services Layer
 **Fichier** : `lib/core/data/services/api.service.impl.dart`
 
 #### Responsabilités
+
 - Communication HTTP avec le backend
 - Gestion automatique des tokens dans les headers
 - Refresh automatique des tokens expirés
@@ -245,6 +250,7 @@ Services Layer
 #### Fonctionnalités clés
 
 ##### Gestion automatique des headers
+
 ```dart
 Map<String, String> _jsonHeaders() {
   final headers = {
@@ -262,6 +268,7 @@ Map<String, String> _jsonHeaders() {
 ```
 
 ##### Mécanisme de retry avec refresh token
+
 ```dart
 Future<T> _executeWithRetry<T>(Future<T> Function() request) async {
   try {
@@ -275,14 +282,14 @@ Future<T> _executeWithRetry<T>(Future<T> Function() request) async {
       final refreshResult = await refreshCallback!();
       final newAccessToken = refreshResult['access_token'] as String?;
       final newRefreshToken = refreshResult['refresh_token'] as String?;
-      
+
       if (newAccessToken != null && newRefreshToken != null) {
         await tokenManager.setTokens(
           accessToken: newAccessToken,
           refreshToken: newRefreshToken,
           accessTokenExpiry: DateTime.now().add(const Duration(hours: 1)),
         );
-        
+
         // Retry de la requête originale
         return await request();
       }
@@ -295,16 +302,16 @@ Future<T> _executeWithRetry<T>(Future<T> Function() request) async {
 
 ##### Méthodes HTTP disponibles
 
-| Méthode | Retour | Usage |
-|---------|--------|-------|
-| `get(endpoint)` | `List<dynamic>` | Récupérer une liste de ressources |
-| `getObject(endpoint)` | `Map<String, dynamic>` | Récupérer un objet unique |
-| `getByPath(resource, value)` | `Map<String, dynamic>` | GET avec paramètre de chemin |
-| `getListByPath(resource, value)` | `List<dynamic>` | GET liste avec paramètre |
-| `post(endpoint, data)` | `Map<String, dynamic>` | Créer ou envoyer des données |
-| `put(endpoint, data)` | `Map<String, dynamic>` | Mettre à jour une ressource |
-| `delete(endpoint)` | `void` | Supprimer une ressource |
-| `getRaw(endpoint)` | `String` | Récupérer du contenu brut (SVG, etc.) |
+| Méthode                          | Retour                 | Usage                                 |
+| -------------------------------- | ---------------------- | ------------------------------------- |
+| `get(endpoint)`                  | `List<dynamic>`        | Récupérer une liste de ressources     |
+| `getObject(endpoint)`            | `Map<String, dynamic>` | Récupérer un objet unique             |
+| `getByPath(resource, value)`     | `Map<String, dynamic>` | GET avec paramètre de chemin          |
+| `getListByPath(resource, value)` | `List<dynamic>`        | GET liste avec paramètre              |
+| `post(endpoint, data)`           | `Map<String, dynamic>` | Créer ou envoyer des données          |
+| `put(endpoint, data)`            | `Map<String, dynamic>` | Mettre à jour une ressource           |
+| `delete(endpoint)`               | `void`                 | Supprimer une ressource               |
+| `getRaw(endpoint)`               | `String`               | Récupérer du contenu brut (SVG, etc.) |
 
 ### 2. AuthService (Authentification)
 
@@ -702,13 +709,13 @@ lib/
 
 ### Conventions de nommage
 
-| Type | Convention | Exemple |
-|------|-----------|---------|
-| Fichier | snake_case | `auth.service.dart` |
-| Classe | PascalCase | `AuthService` |
-| Variable | camelCase | `userProfile` |
-| Constante | camelCase | `apiBaseUrl` |
-| Private | _prefix | `_loadUserProfile()` |
+| Type      | Convention | Exemple              |
+| --------- | ---------- | -------------------- |
+| Fichier   | snake_case | `auth.service.dart`  |
+| Classe    | PascalCase | `AuthService`        |
+| Variable  | camelCase  | `userProfile`        |
+| Constante | camelCase  | `apiBaseUrl`         |
+| Private   | \_prefix   | `_loadUserProfile()` |
 
 ---
 
@@ -720,24 +727,24 @@ lib/
 dependencies:
   flutter:
     sdk: flutter
-  
+
   # HTTP et communication
-  http: ^1.2.0                      # Requêtes HTTP
-  
+  http: ^1.2.0 # Requêtes HTTP
+
   # Formatage et internationalisation
-  intl: ^0.18.1                     # Formatage dates/nombres
-  
+  intl: ^0.18.1 # Formatage dates/nombres
+
   # UI Components
-  carousel_slider: ^5.0.0           # Carousel d'images
-  cupertino_icons: ^1.0.8          # Icônes iOS
-  qr_flutter: ^4.1.0               # Génération QR codes
-  
+  carousel_slider: ^5.0.0 # Carousel d'images
+  cupertino_icons: ^1.0.8 # Icônes iOS
+  qr_flutter: ^4.1.0 # Génération QR codes
+
   # Stockage et état
-  shared_preferences: ^2.2.3        # Persistance locale (cache)
-  provider: ^6.1.5+1               # Gestion d'état (disponible)
-  
+  shared_preferences: ^2.2.3 # Persistance locale (cache)
+  provider: ^6.1.5+1 # Gestion d'état (disponible)
+
   # Médias
-  image_picker: ^1.0.7             # Sélection d'images
+  image_picker: ^1.0.7 # Sélection d'images
 ```
 
 ### Dev Dependencies
@@ -746,26 +753,30 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0            # Règles de linting
+  flutter_lints: ^4.0.0 # Règles de linting
 ```
 
 ### Utilisation des dépendances
 
 #### SharedPreferences
+
 - **Usage** : Cache persistant pour tokens JWT
 - **Emplacement** : `TokenManagerMobile`
 - **Données stockées** : access_token, refresh_token, expiry
 
 #### HTTP
+
 - **Usage** : Communication avec l'API REST
 - **Emplacement** : `ApiServiceImpl`
 - **Features** : GET, POST, PUT, DELETE
 
 #### QR Flutter
+
 - **Usage** : Affichage des QR codes utilisateur
 - **Emplacement** : Widgets de profil/dashboard
 
 #### Provider
+
 - **Usage** : (Prévu) Gestion d'état globale
 - **Statut** : Dépendance installée mais non encore utilisée
 
@@ -794,6 +805,7 @@ static String apiBaseUrl = 'http://localhost:8000/api';
 Pour gérer plusieurs environnements (dev, staging, prod) :
 
 **Option 1 : Fichiers .env multiples**
+
 ```
 .env.dev
 .env.staging
@@ -801,11 +813,13 @@ Pour gérer plusieurs environnements (dev, staging, prod) :
 ```
 
 **Option 2 : Variables d'environnement au build**
+
 ```bash
 flutter build apk --dart-define=API_BASE_URL=https://api.prod.com
 ```
 
 Puis dans le code :
+
 ```dart
 const apiBaseUrl = String.fromEnvironment(
   'API_BASE_URL',
@@ -818,6 +832,7 @@ const apiBaseUrl = String.fromEnvironment(
 **Durée de vie par défaut** : 1 heure
 
 Pour modifier :
+
 ```dart
 await tokenManager.setTokens(
   accessToken: token,
@@ -833,6 +848,7 @@ await tokenManager.setTokens(
 ### 1. Gestion des erreurs
 
 #### ✅ FAIRE
+
 ```dart
 try {
   final profile = await authService.getProfile();
@@ -851,6 +867,7 @@ try {
 ```
 
 #### ❌ ÉVITER
+
 ```dart
 final profile = await authService.getProfile(); // Pas de try/catch
 setState(() {}); // Sans vérifier mounted
@@ -863,7 +880,7 @@ Toujours vérifier `mounted` avant `setState` dans un callback async :
 ```dart
 Future<void> _loadData() async {
   final data = await service.getData();
-  
+
   if (mounted) { // ← Important !
     setState(() {
       _data = data;
@@ -875,6 +892,7 @@ Future<void> _loadData() async {
 ### 3. Injection de dépendances
 
 #### ✅ FAIRE (Constructor injection)
+
 ```dart
 class DashboardScreen extends StatefulWidget {
   final AuthService authService;
@@ -888,6 +906,7 @@ class DashboardScreen extends StatefulWidget {
 ```
 
 #### ❌ ÉVITER (Singleton global)
+
 ```dart
 final authService = AuthService.instance; // Anti-pattern
 ```
@@ -1037,15 +1056,18 @@ class Logger {
 ## 📊 Métriques et KPIs
 
 ### Temps de réponse moyen
+
 - **Login** : ~500ms
 - **GetProfile** : ~300ms
 - **Transfer** : ~800ms
 
 ### Taille du cache
+
 - **Tokens** : ~500 bytes
 - **SharedPreferences total** : <1KB
 
 ### Taux de refresh automatique
+
 - **Fréquence** : ~1 fois par heure (durée du token)
 - **Succès** : 99.5%
 
@@ -1054,16 +1076,19 @@ class Logger {
 ## 🔒 Sécurité
 
 ### 1. Tokens JWT
+
 - Stockés dans **SharedPreferences** (chiffré sur iOS/Android)
 - Jamais exposés dans les logs (production)
 - Refresh automatique avant expiration
 
 ### 2. HTTPS obligatoire en production
+
 ```dart
 assert(Config.apiBaseUrl.startsWith('https://'));
 ```
 
 ### 3. Pas de données sensibles en clair
+
 - Pas de mots de passe stockés localement
 - Seuls les tokens sont persistés
 
@@ -1072,24 +1097,29 @@ assert(Config.apiBaseUrl.startsWith('https://'));
 ## 📈 Évolutions futures
 
 ### 1. Migration vers Provider/Riverpod
+
 - État global pour profil utilisateur
 - Moins de prop drilling
 - Meilleur testabilité
 
 ### 2. Cache des données métier
+
 - Cache des transactions récentes
 - Cache du solde avec TTL
 - Stratégie stale-while-revalidate
 
 ### 3. Offline mode
+
 - Queue de transactions hors ligne
 - Synchronisation automatique
 
 ### 4. Analytics
+
 - Firebase Analytics
 - Tracking des erreurs (Sentry)
 
 ### 5. Tests
+
 - Tests unitaires des services
 - Tests d'intégration API
 - Tests de widgets
@@ -1104,15 +1134,17 @@ L'application **OM Paie Flutter** suit une architecture claire et maintenable av
 ✅ Cache efficace avec SharedPreferences  
 ✅ Gestion robuste de l'authentification JWT  
 ✅ Retry automatique des requêtes  
-✅ Structure modulaire par features  
+✅ Structure modulaire par features
 
 ### Points forts
+
 - Architecture scalable
 - Gestion du cache optimisée
 - Injection de dépendances propre
 - Gestion d'erreurs centralisée
 
 ### Points d'amélioration
+
 - Migration vers Provider pour l'état global
 - Ajout de tests automatisés
 - Implémentation du mode offline

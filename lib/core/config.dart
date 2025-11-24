@@ -2,7 +2,8 @@ import 'dart:io';
 
 class Config {
   // URL de base de l'API - modifier selon votre environnement
-  static String apiBaseUrl = 'http://localhost:8000/api';
+  // static String apiBaseUrl = 'http://localhost:8000/api';
+  static String apiBaseUrl = 'https://tinkin-transfer.onrender.com/api';
 
   // Pour charger d'autres configurations si nécessaire
   static Future<void> load() async {
