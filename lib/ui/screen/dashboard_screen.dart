@@ -111,6 +111,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 // Ouvrir le menu latéral
                 _showMenuDrawer();
               },
+              onBalanceRefresh: () {
+                // Actualiser le solde depuis le serveur
+                _loadUserProfile();
+              },
             ),
             PaymentSection(
               onPayPressed: (amount, recipient) async {

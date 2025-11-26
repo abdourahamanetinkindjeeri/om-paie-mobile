@@ -7,6 +7,7 @@ class DashboardHeader extends StatefulWidget {
   final List<Map<String, dynamic>> comptes;
   final Map<String, dynamic>? qrCode;
   final VoidCallback onMenuPressed;
+  final VoidCallback? onBalanceRefresh;
 
   const DashboardHeader({
     Key? key,
@@ -14,6 +15,7 @@ class DashboardHeader extends StatefulWidget {
     this.comptes = const [],
     this.qrCode,
     required this.onMenuPressed,
+    this.onBalanceRefresh,
   }) : super(key: key);
 
   @override
@@ -100,6 +102,9 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                               const SizedBox(width: 6),
                               IconButton(
                                 onPressed: () {
+                                  if (widget.onBalanceRefresh != null) {
+                                    widget.onBalanceRefresh!();
+                                  }
                                   setState(() {
                                     _isBalanceVisible = !_isBalanceVisible;
                                   });
