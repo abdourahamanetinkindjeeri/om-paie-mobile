@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
+import 'package:om_paie_flutter/ui/widgets/qr_scanner_screen.dart';
 
 class PaymentSection extends StatefulWidget {
   final Future<void> Function(String amount, String recipient) onPayPressed;
@@ -167,43 +168,119 @@ class _PaymentSectionState extends State<PaymentSection> {
             ],
           ),
           const SizedBox(height: 10),
-          // Recipient input
-          TextField(
-            controller: _recipientController,
-            style: TextStyle(color: theme.textTheme.bodyLarge?.color),
-            decoration: InputDecoration(
-              hintText: _isPaymentSelected
-                  ? 'Saisir le code marchand'
-                  : 'Saisir le numéro de téléphone',
-              hintStyle: TextStyle(color: theme.textTheme.bodySmall?.color),
-              filled: true,
-              fillColor: theme.scaffoldBackgroundColor,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
+          // Input fields with single scan button on the right
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 70,
+                child: Column(
+                  children: [
+                    // Recipient input
+                    TextField(
+                      controller: _recipientController,
+                      style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+                      decoration: InputDecoration(
+                        hintText: _isPaymentSelected
+                            ? 'Saisir le code marchand'
+                            : 'Saisir le numéro de téléphone',
+                        hintStyle:
+                            TextStyle(color: theme.textTheme.bodySmall?.color),
+                        filled: true,
+                        fillColor: theme.scaffoldBackgroundColor,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // Amount input
+                    TextField(
+                      controller: _amountController,
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(color: theme.textTheme.bodyLarge?.color),
+                      decoration: InputDecoration(
+                        hintText: 'Saisir le montant',
+                        hintStyle:
+                            TextStyle(color: theme.textTheme.bodySmall?.color),
+                        filled: true,
+                        fillColor: theme.scaffoldBackgroundColor,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            ),
-          ),
-          const SizedBox(height: 10),
-          // Amount input
-          TextField(
-            controller: _amountController,
-            keyboardType: TextInputType.number,
-            style: TextStyle(color: theme.textTheme.bodyLarge?.color),
-            decoration: InputDecoration(
-              hintText: 'Saisir le montant',
-              hintStyle: TextStyle(color: theme.textTheme.bodySmall?.color),
-              filled: true,
-              fillColor: theme.scaffoldBackgroundColor,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
+              const SizedBox(width: 8),
+              // Single scan button for both fields
+              Expanded(
+                flex: 30,
+                child: GestureDetector(
+                  onTap: () async {
+                    // Ouvrir la caméra pour scanner le QR code
+                    final result = await Navigator.push<String>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const QRScannerScreen(),
+                      ),
+                    );
+
+                    if (result != null && result.isNotEmpty) {
+                      // Basculer automatiquement vers Transférer après le scan
+                      setState(() {
+                        if (_isPaymentSelected) {
+                          _isPaymentSelected =
+                              false; // Passer en mode Transfert
+                        }
+                        _recipientController.text = result;
+                      });
+
+                      // Afficher un message et focus sur le champ montant
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                                'Numéro scanné: $result\nMode Transfert activé'),
+                            backgroundColor: AppColors.primary,
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+
+                        // Focus sur le champ montant pour saisie
+                        FocusScope.of(context).nextFocus();
+                      }
+                    }
+                  },
+                  child: Container(
+                    height:
+                        94, // Height to match both input fields combined (42 + 10 + 42)
+                    decoration: BoxDecoration(
+                      color: theme.scaffoldBackgroundColor,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: AppColors.primary,
+                        width: 2,
+                      ),
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.qr_code_scanner,
+                        color: AppColors.primary,
+                        size: 32,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            ),
+            ],
           ),
           const SizedBox(height: 12),
           // Validate button

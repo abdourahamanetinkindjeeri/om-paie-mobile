@@ -123,7 +123,8 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.all(6),
+                width: 100,
+                height: 100,
                 decoration: BoxDecoration(
                   border: Border.all(
                       color: theme.textTheme.bodyLarge?.color ?? Colors.white,
@@ -136,7 +137,7 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                     data: widget.qrCode?['qr_string'] ??
                         'OM_PAY_${userName.hashCode}',
                     version: 5,
-                    size: 70,
+                    size: 100,
                     gapless: true,
                     dataModuleStyle: const QrDataModuleStyle(
                       dataModuleShape: QrDataModuleShape.square,
@@ -150,13 +151,13 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                     errorCorrectionLevel: QrErrorCorrectLevel.M,
                     errorStateBuilder: (cxt, err) {
                       return Container(
-                        width: 70,
-                        height: 70,
+                        width: 100,
+                        height: 100,
                         color: theme.cardTheme.color,
                         child: Icon(
                           Icons.qr_code,
                           color: theme.textTheme.bodyLarge?.color,
-                          size: 40,
+                          size: 60,
                         ),
                       );
                     },
