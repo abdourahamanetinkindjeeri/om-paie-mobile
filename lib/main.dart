@@ -3,14 +3,17 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/constants/app_strings.dart';
+import 'package:om_paie_flutter/constants/app_themes.dart';
 import 'package:om_paie_flutter/core/config.dart';
 import 'package:om_paie_flutter/core/data/services/api.service.impl.dart';
+import 'package:om_paie_flutter/core/storage/secure_storage.dart';
 import 'package:om_paie_flutter/core/storage/storage_migration.dart';
 import 'package:om_paie_flutter/features/auth/auth.service.dart';
 import 'package:om_paie_flutter/features/auth/token_manager_mobile.dart';
 import 'package:om_paie_flutter/features/comptes/compte.service.dart';
 import 'package:om_paie_flutter/providers/auth_provider.dart';
 import 'package:om_paie_flutter/providers/compte_provider.dart';
+import 'package:om_paie_flutter/providers/theme_provider.dart';
 import 'package:om_paie_flutter/routes/route.dart';
 import 'package:om_paie_flutter/ui/widgets/carousel_section.dart';
 import 'package:om_paie_flutter/ui/widgets/login_form_section.dart';
@@ -30,6 +33,8 @@ void main() async {
   final tokenManager = TokenManagerMobile();
   await tokenManager.loadTokens();
 
+  final secureStorage = SecureStorage.getInstance();
+
   final apiService = ApiServiceImpl(
     Config.apiBaseUrl,
     tokenManager: tokenManager,
@@ -42,6 +47,10 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        // Provider pour le thème
+        ChangeNotifierProvider(
+          create: (_) => ThemeProvider(secureStorage),
+        ),
         // Provider pour l'authentification
         ChangeNotifierProvider(
           create: (_) => AuthProvider(
@@ -66,31 +75,34 @@ class OrangeMoneyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: AppStrings.appTitle,
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: AppColors.primary,
-        scaffoldBackgroundColor: Colors.black,
-      ),
-      initialRoute: AppRoutes.home,
-      onGenerateRoute: (settings) {
-        final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        final compteProvider =
-            Provider.of<CompteProvider>(context, listen: false);
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          title: AppStrings.appTitle,
+          debugShowCheckedModeBanner: false,
+          theme: AppThemes.lightTheme,
+          darkTheme: AppThemes.darkTheme,
+          themeMode: themeProvider.themeMode,
+          initialRoute: AppRoutes.home,
+          onGenerateRoute: (settings) {
+            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            final compteProvider =
+                Provider.of<CompteProvider>(context, listen: false);
 
-        return AppRoutes.onGenerateRoute(
-          settings,
-          authService: authProvider.authService,
-          tokenManager: authProvider.tokenManager,
-          compteService: compteProvider.compteService,
+            return AppRoutes.onGenerateRoute(
+              settings,
+              authService: authProvider.authService,
+              tokenManager: authProvider.tokenManager,
+              compteService: compteProvider.compteService,
+            );
+          },
+          routes: {
+            AppRoutes.home: (context) => const LoginScreen(),
+            AppRoutes.login: (context) => const LoginScreen(),
+          },
+          onUnknownRoute: (settings) => AppRoutes.onUnknownRoute(settings),
         );
       },
-      routes: {
-        AppRoutes.home: (context) => const LoginScreen(),
-        AppRoutes.login: (context) => const LoginScreen(),
-      },
-      onUnknownRoute: (settings) => AppRoutes.onUnknownRoute(settings),
     );
   }
 }

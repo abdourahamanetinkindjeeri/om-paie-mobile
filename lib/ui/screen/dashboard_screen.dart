@@ -3,9 +3,11 @@ import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/features/auth/auth.service.dart';
 import 'package:om_paie_flutter/features/auth/itoken_manager.dart';
 import 'package:om_paie_flutter/features/comptes/compte.service.dart';
+import 'package:om_paie_flutter/providers/theme_provider.dart';
 import 'package:om_paie_flutter/ui/widgets/dashboard_header.dart';
 import 'package:om_paie_flutter/ui/widgets/payment_section.dart';
 import 'package:om_paie_flutter/ui/widgets/transaction_history.dart';
+import 'package:provider/provider.dart';
 
 class DashboardScreen extends StatefulWidget {
   final AuthService authService;
@@ -83,9 +85,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     if (_isLoading) {
-      return const Scaffold(
-        backgroundColor: AppColors.background,
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: Center(
           child: CircularProgressIndicator(
             color: AppColors.primary,
@@ -95,7 +99,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -130,13 +134,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _showMenuDrawer() {
     // Afficher le menu latéral
+    final theme = Theme.of(context);
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: theme.cardTheme.color,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
+        final themeProvider = Provider.of<ThemeProvider>(context);
         return Container(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -144,8 +150,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.person, color: AppColors.primary),
-                title: const Text('Mon profil',
-                    style: TextStyle(color: AppColors.textPrimary)),
+                title: Text('Mon profil',
+                    style: TextStyle(color: theme.textTheme.bodyLarge?.color)),
                 onTap: () {
                   Navigator.pop(context);
                   // Naviguer vers le profil
@@ -153,23 +159,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               ListTile(
                 leading: const Icon(Icons.settings, color: AppColors.primary),
-                title: const Text('Paramètres',
-                    style: TextStyle(color: AppColors.textPrimary)),
+                title: Text('Paramètres',
+                    style: TextStyle(color: theme.textTheme.bodyLarge?.color)),
                 onTap: () {
                   Navigator.pop(context);
                   // Naviguer vers les paramètres
                 },
               ),
+              Builder(
+                builder: (context) {
+                  IconData themeIcon;
+                  String themeText;
+                  switch (themeProvider.themeMode) {
+                    case ThemeMode.light:
+                      themeIcon = Icons.light_mode;
+                      themeText = 'Mode sombre';
+                      break;
+                    case ThemeMode.dark:
+                      themeIcon = Icons.brightness_6;
+                      themeText = 'Mode système';
+                      break;
+                    case ThemeMode.system:
+                      themeIcon = Icons.dark_mode;
+                      themeText = 'Mode clair';
+                      break;
+                  }
+                  return ListTile(
+                    leading: Icon(themeIcon, color: AppColors.primary),
+                    title: Text(themeText,
+                        style:
+                            TextStyle(color: theme.textTheme.bodyLarge?.color)),
+                    onTap: () {
+                      themeProvider.toggleTheme();
+                      Navigator.pop(context);
+                    },
+                  );
+                },
+              ),
               ListTile(
                 leading: const Icon(Icons.help, color: AppColors.primary),
-                title: const Text('Aide',
-                    style: TextStyle(color: AppColors.textPrimary)),
+                title: Text('Aide',
+                    style: TextStyle(color: theme.textTheme.bodyLarge?.color)),
                 onTap: () {
                   Navigator.pop(context);
                   // Naviguer vers l'aide
                 },
               ),
-              const Divider(color: AppColors.border),
+              Divider(color: theme.dividerColor),
               ListTile(
                 leading: const Icon(Icons.logout, color: Colors.red),
                 title: const Text('Déconnexion',

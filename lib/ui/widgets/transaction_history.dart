@@ -72,6 +72,8 @@ class _TransactionHistoryState extends State<TransactionHistory> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
       child: Column(
@@ -80,10 +82,10 @@ class _TransactionHistoryState extends State<TransactionHistory> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Historique',
                 style: TextStyle(
-                  color: AppColors.textPrimary,
+                  color: theme.textTheme.bodyLarge?.color,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -117,11 +119,13 @@ class _TransactionHistoryState extends State<TransactionHistory> {
   }
 
   Widget _buildTransactionItem(Map<String, dynamic> transaction) {
+    final theme = Theme.of(context);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: theme.cardTheme.color,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
@@ -130,12 +134,12 @@ class _TransactionHistoryState extends State<TransactionHistory> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppColors.background,
+              color: theme.scaffoldBackgroundColor,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
               _getTransactionIcon(transaction['type']),
-              color: AppColors.textSecondary,
+              color: theme.textTheme.bodySmall?.color,
               size: 20,
             ),
           ),
@@ -147,8 +151,8 @@ class _TransactionHistoryState extends State<TransactionHistory> {
               children: [
                 Text(
                   transaction['title'],
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
+                  style: TextStyle(
+                    color: theme.textTheme.bodyLarge?.color,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -156,8 +160,8 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                 const SizedBox(height: 2),
                 Text(
                   transaction['recipient'],
-                  style: const TextStyle(
-                    color: AppColors.textSecondary,
+                  style: TextStyle(
+                    color: theme.textTheme.bodySmall?.color,
                     fontSize: 11,
                   ),
                 ),
@@ -175,21 +179,21 @@ class _TransactionHistoryState extends State<TransactionHistory> {
                     style: TextStyle(
                       color: transaction['isPositive']
                           ? Colors.green
-                          : AppColors.textPrimary,
+                          : theme.textTheme.bodyLarge?.color,
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(width: 6),
-                  const Icon(
+                  Icon(
                     Icons.search,
-                    color: AppColors.textSecondary,
+                    color: theme.textTheme.bodySmall?.color,
                     size: 14,
                   ),
                   const SizedBox(width: 3),
-                  const Icon(
+                  Icon(
                     Icons.keyboard_arrow_down,
-                    color: AppColors.textSecondary,
+                    color: theme.textTheme.bodySmall?.color,
                     size: 14,
                   ),
                 ],
@@ -197,8 +201,8 @@ class _TransactionHistoryState extends State<TransactionHistory> {
               const SizedBox(height: 2),
               Text(
                 transaction['date'],
-                style: const TextStyle(
-                  color: AppColors.textSecondary,
+                style: TextStyle(
+                  color: theme.textTheme.bodySmall?.color,
                   fontSize: 11,
                 ),
               ),

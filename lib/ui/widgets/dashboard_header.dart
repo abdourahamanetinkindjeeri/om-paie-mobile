@@ -36,10 +36,12 @@ class _DashboardHeaderState extends State<DashboardHeader> {
         : 'CFA';
     final displayBalance = _isBalanceVisible ? '$balance $devise' : '****';
 
+    final theme = Theme.of(context);
+
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-      decoration: const BoxDecoration(
-        color: AppColors.background,
+      padding: const EdgeInsets.fromLTRB(15, 8, 15, 8),
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,24 +55,24 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                     GestureDetector(
                       onTap: widget.onMenuPressed,
                       child: Container(
-                        padding: const EdgeInsets.all(8),
-                        child: const Icon(
+                        padding: const EdgeInsets.all(6),
+                        child: Icon(
                           Icons.menu,
-                          color: AppColors.textPrimary,
-                          size: 28,
+                          color: theme.textTheme.bodyLarge?.color,
+                          size: 24,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Bonjour',
                             style: TextStyle(
-                              color: AppColors.textPrimary,
-                              fontSize: 18,
+                              color: theme.textTheme.bodyLarge?.color,
+                              fontSize: 14,
                               fontWeight: FontWeight.normal,
                             ),
                           ),
@@ -78,24 +80,24 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                             userName,
                             style: const TextStyle(
                               color: AppColors.primary,
-                              fontSize: 18,
+                              fontSize: 15,
                               fontWeight: FontWeight.bold,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 2),
                           Row(
                             children: [
                               Text(
                                 displayBalance,
                                 style: const TextStyle(
                                   color: AppColors.primary,
-                                  fontSize: 20,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 6),
                               IconButton(
                                 onPressed: () {
                                   setState(() {
@@ -106,8 +108,8 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                                   _isBalanceVisible
                                       ? Icons.visibility
                                       : Icons.visibility_off,
-                                  color: AppColors.textSecondary,
-                                  size: 16,
+                                  color: theme.textTheme.bodySmall?.color,
+                                  size: 14,
                                 ),
                                 padding: EdgeInsets.zero,
                                 constraints: const BoxConstraints(),
@@ -121,18 +123,20 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.textPrimary, width: 2),
-                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                      color: theme.textTheme.bodyLarge?.color ?? Colors.white,
+                      width: 2),
+                  borderRadius: BorderRadius.circular(6),
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(4),
                   child: QrImageView(
                     data: widget.qrCode?['qr_string'] ??
                         'OM_PAY_${userName.hashCode}',
                     version: 5,
-                    size: 90,
+                    size: 70,
                     gapless: true,
                     dataModuleStyle: const QrDataModuleStyle(
                       dataModuleShape: QrDataModuleShape.square,
@@ -146,13 +150,13 @@ class _DashboardHeaderState extends State<DashboardHeader> {
                     errorCorrectionLevel: QrErrorCorrectLevel.M,
                     errorStateBuilder: (cxt, err) {
                       return Container(
-                        width: 90,
-                        height: 90,
-                        color: AppColors.surface,
-                        child: const Icon(
+                        width: 70,
+                        height: 70,
+                        color: theme.cardTheme.color,
+                        child: Icon(
                           Icons.qr_code,
-                          color: AppColors.textPrimary,
-                          size: 50,
+                          color: theme.textTheme.bodyLarge?.color,
+                          size: 40,
                         ),
                       );
                     },
