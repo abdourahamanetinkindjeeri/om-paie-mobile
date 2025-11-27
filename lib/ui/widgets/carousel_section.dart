@@ -35,7 +35,7 @@ class _CarouselSectionState extends State<CarouselSection> {
   }
 
   void _startAutoScroll() {
-    _timer = Timer.periodic(const Duration(seconds: 5), (Timer timer) {
+    _timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
       if (widget.pageController.hasClients) {
         int nextPage = widget.currentPage + 1;
         if (nextPage >= _carouselItems.length) {
@@ -68,7 +68,7 @@ class _CarouselSectionState extends State<CarouselSection> {
           'https://cmsphoto.ww-cdn.com/superstatic/36975/art/grande/9709856-15650784.jpg?v=1466415034',
     ),
     CarouselItem(
-      icon: '💰',
+      icon: '',
       title: 'Payer',
       description:
           'Effectuez vos paiements rapidement\net en toute sécurité avec\nOrange Money.',
