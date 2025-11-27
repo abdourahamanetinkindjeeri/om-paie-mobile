@@ -268,6 +268,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Expanded(
               child: TransactionHistory(
                 transactions: _historiqueTransactions,
+                onTransactionTap: (transaction) {
+                  _showTransactionDetails(transaction);
+                },
               ),
             ),
           ],
@@ -378,6 +381,67 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  void _showTransactionDetails(Map<String, dynamic> transaction) {
+    final lang = Provider.of<LanguageProvider>(context, listen: false).locale.languageCode;
+    final direction = transaction['direction'] as String?;
+    final isDebit = direction == 'debit';
+
+    final labels = {
+      'fr': {
+        'title': 'Détails de la transaction',
+        'type': 'Type',
+        'contact': isDebit ? 'Numéro du receveur' : 'Numéro de l\'émetteur',
+        'reference': 'Référence',
+        'amount': 'Montant',
+        'date': 'Date',
+        'close': 'Fermer',
+      },
+      'en': {
+        'title': 'Transaction Details',
+        'type': 'Type',
+        'contact': isDebit ? 'Receiver Number' : 'Sender Number',
+        'reference': 'Reference',
+        'amount': 'Amount',
+        'date': 'Date',
+        'close': 'Close',
+      },
+    };
+    final l = labels[lang] ?? labels['fr']!;
+
+    final metadata = transaction['metadata'] as Map<String, dynamic>? ?? {};
+    String contactNumber;
+    if (isDebit) {
+      contactNumber = metadata['receiver_number'] ?? metadata['user_phone'] ?? 'N/A';
+    } else {
+      contactNumber = metadata['sender_number'] ?? 'N/A';
+    }
+    final reference = transaction['id'] ?? transaction['date_transaction'] ?? 'N/A';
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l['title']!),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('${l['type']!}: ${transaction['type'] ?? 'N/A'}'),
+            Text('${l['contact']!}: $contactNumber'),
+            Text('${l['reference']!}: $reference'),
+            Text('${l['amount']!}: ${transaction['montant'] ?? 'N/A'} CFA'),
+            Text('${l['date']!}: ${transaction['date_transaction'] ?? 'N/A'}'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l['close']!),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _handleLogout() async {
     await widget.tokenManager.clearTokens();
     if (mounted) {
@@ -385,3 +449,5 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 }
+
+

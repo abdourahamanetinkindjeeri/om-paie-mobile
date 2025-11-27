@@ -28,8 +28,8 @@ class PinCarouselSection extends StatelessWidget {
                   child: Stack(
                     fit: StackFit.expand,
                     children: <Widget>[
-                      Image.network(
-                        'https://www.gstatic.com/flutter-onestack-prototype/genui/example_1.jpg',
+                      Image.asset(
+                        'assets/pin.png',
                         fit: BoxFit.cover,
                         errorBuilder: (BuildContext context, Object error,
                             StackTrace? stackTrace) {
@@ -69,46 +69,6 @@ class PinCarouselSection extends StatelessWidget {
                 children: <Widget>[
                   Row(
                     children: <Widget>[
-                      Container(
-                        width: 45,
-                        height: 45,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: AppColors.primary,
-                            width: 2.5,
-                          ),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.arrow_forward_rounded,
-                            color: AppColors.primary,
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Container(
-                        width: 45,
-                        height: 45,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: AppColors.primaryLight,
-                            width: 2.5,
-                          ),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.check_rounded,
-                            color: Colors.white,
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 14),
                       RichText(
                         text: TextSpan(
                           children: <TextSpan>[

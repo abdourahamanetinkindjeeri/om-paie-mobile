@@ -203,7 +203,9 @@ class _PinFormSectionState extends State<PinFormSection> {
               ),
               const SizedBox(height: 8),
               Text(
-                '${strings.countryCode} ${widget.phoneNumber}',
+                widget.phoneNumber.startsWith('+221')
+                    ? widget.phoneNumber
+                    : '${strings.countryCode} ${widget.phoneNumber}',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: AppColors.textSecondary,

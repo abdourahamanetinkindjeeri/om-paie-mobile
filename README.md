@@ -95,3 +95,4 @@ Pour exécuter les tests :
 Les contributions sont les bienvenues !
 
 Pour toute question ou suggestion, ouvrez une issue sur le dépôt.
+gnu

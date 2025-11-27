@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+ import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 
 class PageIndicators extends StatelessWidget {

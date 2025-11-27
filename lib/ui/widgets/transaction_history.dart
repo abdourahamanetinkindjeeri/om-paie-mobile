@@ -5,10 +5,12 @@ import 'package:om_paie_flutter/constants/app_colors.dart';
 
 class TransactionHistory extends StatefulWidget {
   final List<Map<String, dynamic>> transactions;
+  final Function(Map<String, dynamic> transaction)? onTransactionTap;
 
   const TransactionHistory({
     Key? key,
     this.transactions = const [],
+    this.onTransactionTap,
   }) : super(key: key);
 
   @override
@@ -111,8 +113,18 @@ class _TransactionHistoryState extends State<TransactionHistory> {
               physics: const AlwaysScrollableScrollPhysics(),
               itemCount: _transactions.length,
               itemBuilder: (context, index) {
-                final transaction = _transactions[index];
-                return _buildTransactionItem(transaction);
+                final originalTransaction = widget.transactions[index];
+                final processedTransaction = _transactions[index];
+                return Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => widget.onTransactionTap?.call(originalTransaction),
+                    borderRadius: BorderRadius.circular(10),
+                    splashColor: AppColors.primary.withOpacity(0.3),
+                    highlightColor: AppColors.primary.withOpacity(0.1),
+                    child: _buildTransactionItem(processedTransaction),
+                  ),
+                );
               },
             ),
           ),
@@ -124,12 +136,24 @@ class _TransactionHistoryState extends State<TransactionHistory> {
   Widget _buildTransactionItem(Map<String, dynamic> transaction) {
     final theme = Theme.of(context);
 
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: theme.cardTheme.color,
         borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: AppColors.primary.withOpacity(0.3),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Row(
         children: [
