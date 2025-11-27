@@ -19,6 +19,8 @@ import 'package:om_paie_flutter/ui/widgets/carousel_section.dart';
 import 'package:om_paie_flutter/ui/widgets/login_form_section.dart';
 import 'package:om_paie_flutter/ui/widgets/pin_carousel_section.dart';
 import 'package:om_paie_flutter/ui/widgets/pin_form_section.dart';
+import 'package:om_paie_flutter/providers/language_provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,22 +49,22 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        // Provider pour le thème
         ChangeNotifierProvider(
           create: (_) => ThemeProvider(secureStorage),
         ),
-        // Provider pour l'authentification
         ChangeNotifierProvider(
           create: (_) => AuthProvider(
             authService: authService,
             tokenManager: tokenManager,
           ),
         ),
-        // Provider pour les comptes
         ChangeNotifierProvider(
           create: (_) => CompteProvider(
             compteService: compteService,
           ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => LanguageProvider(),
         ),
       ],
       child: const OrangeMoneyApp(),
@@ -75,20 +77,27 @@ class OrangeMoneyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(
-      builder: (context, themeProvider, child) {
+    return Consumer2<ThemeProvider, LanguageProvider>(
+      builder: (context, themeProvider, languageProvider, child) {
         return MaterialApp(
           title: AppStrings.appTitle,
           debugShowCheckedModeBanner: false,
           theme: AppThemes.lightTheme,
           darkTheme: AppThemes.darkTheme,
           themeMode: themeProvider.themeMode,
+          locale: languageProvider.locale,
+          supportedLocales: const [Locale('fr'), Locale('en')],
+          localizationsDelegates: [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
           initialRoute: AppRoutes.home,
           onGenerateRoute: (settings) {
-            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            final authProvider =
+                Provider.of<AuthProvider>(context, listen: false);
             final compteProvider =
                 Provider.of<CompteProvider>(context, listen: false);
-
             return AppRoutes.onGenerateRoute(
               settings,
               authService: authProvider.authService,

@@ -8,6 +8,7 @@ import 'package:om_paie_flutter/ui/widgets/dashboard_header.dart';
 import 'package:om_paie_flutter/ui/widgets/payment_section.dart';
 import 'package:om_paie_flutter/ui/widgets/transaction_history.dart';
 import 'package:provider/provider.dart';
+import 'package:om_paie_flutter/providers/language_provider.dart';
 
 class DashboardScreen extends StatefulWidget {
   final AuthService authService;
@@ -26,6 +27,7 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  // ...existing code...
   Map<String, dynamic>? _userProfile;
   List<Map<String, dynamic>> _comptes = [];
   List<Map<String, dynamic>> _historiqueTransactions = [];
@@ -86,6 +88,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final languageProvider = Provider.of<LanguageProvider>(context);
+    final lang = languageProvider.locale.languageCode;
+
+    // Labels pour le drawer
+    final labels = {
+      'fr': {
+        'dark': 'Sombre',
+        'scanner': 'Scanner',
+        'language': 'Français',
+        'logout': 'Se déconnecter',
+        'version': 'OMPAY Version - 1.1.0(35)',
+        'name': _userProfile?['nom'] ?? '',
+        'phone': _userProfile?['telephone'] ?? '',
+      },
+      'en': {
+        'dark': 'Dark',
+        'scanner': 'Scanner',
+        'language': 'English',
+        'logout': 'Logout',
+        'version': 'OMPAY Version - 1.1.0(35)',
+        'name': _userProfile?['nom'] ?? '',
+        'phone': _userProfile?['telephone'] ?? '',
+      },
+    };
+    final l = labels[lang] ?? labels['fr'];
 
     if (_isLoading) {
       return Scaffold(
@@ -100,21 +128,133 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
+      drawer: Drawer(
+        child: Container(
+          color: theme.cardTheme.color,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Colors.grey[300],
+                      child:
+                          Icon(Icons.person, size: 48, color: Colors.grey[700]),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      l?['name'] ?? '',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 18),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      l?['phone'] ?? '',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.settings, color: AppColors.primary),
+                      const SizedBox(width: 8),
+                      Text(l?['dark'] ?? ''),
+                    ],
+                  ),
+                  Switch(
+                    value: themeProvider.themeMode == ThemeMode.dark,
+                    onChanged: (val) {
+                      themeProvider.toggleTheme();
+                    },
+                    activeColor: AppColors.primary,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.qr_code_scanner,
+                          color: AppColors.primary),
+                      const SizedBox(width: 8),
+                      Text(l?['scanner'] ?? ''),
+                    ],
+                  ),
+                  Switch(
+                    value: false, // À relier à la logique scanner si besoin
+                    onChanged: (val) {},
+                    activeColor: AppColors.primary,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const Icon(Icons.language, color: AppColors.primary),
+                  const SizedBox(width: 8),
+                  Text(l?['language'] ?? ''),
+                  const SizedBox(width: 8),
+                  DropdownButton<String>(
+                    value: lang,
+                    items: const [
+                      DropdownMenuItem(value: 'fr', child: Text('Français')),
+                      DropdownMenuItem(value: 'en', child: Text('English')),
+                    ],
+                    onChanged: (newLang) {
+                      if (newLang != null) {
+                        languageProvider.setLocale(Locale(newLang));
+                      }
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              ListTile(
+                leading: const Icon(Icons.logout, color: Colors.red),
+                title: Text(l?['logout'] ?? '',
+                    style: const TextStyle(color: Colors.red)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _handleLogout();
+                },
+              ),
+              const Spacer(),
+              Center(
+                child: Text(
+                  l?['version'] ?? '',
+                  style: const TextStyle(
+                      color: AppColors.primary, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
       body: SafeArea(
         child: Column(
           children: [
-            DashboardHeader(
-              userProfile: _userProfile,
-              comptes: _comptes,
-              qrCode: _qrCode,
-              onMenuPressed: () {
-                // Ouvrir le menu latéral
-                _showMenuDrawer();
-              },
-              onBalanceRefresh: () {
-                // Actualiser le solde depuis le serveur
-                _loadUserProfile();
-              },
+            Builder(
+              builder: (context) => DashboardHeader(
+                userProfile: _userProfile,
+                comptes: _comptes,
+                qrCode: _qrCode,
+                onMenuPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                onBalanceRefresh: () {
+                  _loadUserProfile();
+                },
+              ),
             ),
             PaymentSection(
               onPayPressed: (amount, recipient) async {
@@ -133,96 +273,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  void _showMenuDrawer() {
-    // Afficher le menu latéral
-    final theme = Theme.of(context);
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: theme.cardTheme.color,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        final themeProvider = Provider.of<ThemeProvider>(context);
-        return Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.person, color: AppColors.primary),
-                title: Text('Mon profil',
-                    style: TextStyle(color: theme.textTheme.bodyLarge?.color)),
-                onTap: () {
-                  Navigator.pop(context);
-                  // Naviguer vers le profil
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.settings, color: AppColors.primary),
-                title: Text('Paramètres',
-                    style: TextStyle(color: theme.textTheme.bodyLarge?.color)),
-                onTap: () {
-                  Navigator.pop(context);
-                  // Naviguer vers les paramètres
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  IconData themeIcon;
-                  String themeText;
-                  switch (themeProvider.themeMode) {
-                    case ThemeMode.light:
-                      themeIcon = Icons.light_mode;
-                      themeText = 'Mode sombre';
-                      break;
-                    case ThemeMode.dark:
-                      themeIcon = Icons.brightness_6;
-                      themeText = 'Mode système';
-                      break;
-                    case ThemeMode.system:
-                      themeIcon = Icons.dark_mode;
-                      themeText = 'Mode clair';
-                      break;
-                  }
-                  return ListTile(
-                    leading: Icon(themeIcon, color: AppColors.primary),
-                    title: Text(themeText,
-                        style:
-                            TextStyle(color: theme.textTheme.bodyLarge?.color)),
-                    onTap: () {
-                      themeProvider.toggleTheme();
-                      Navigator.pop(context);
-                    },
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.help, color: AppColors.primary),
-                title: Text('Aide',
-                    style: TextStyle(color: theme.textTheme.bodyLarge?.color)),
-                onTap: () {
-                  Navigator.pop(context);
-                  // Naviguer vers l'aide
-                },
-              ),
-              Divider(color: theme.dividerColor),
-              ListTile(
-                leading: const Icon(Icons.logout, color: Colors.red),
-                title: const Text('Déconnexion',
-                    style: TextStyle(color: Colors.red)),
-                onTap: () {
-                  Navigator.pop(context);
-                  _handleLogout();
-                },
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 
