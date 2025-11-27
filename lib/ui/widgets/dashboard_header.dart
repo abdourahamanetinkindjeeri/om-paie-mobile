@@ -42,8 +42,8 @@ class _DashboardHeaderState extends State<DashboardHeader> {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(15, 8, 15, 8),
-      decoration: BoxDecoration(
-        color: theme.scaffoldBackgroundColor,
+      decoration: const BoxDecoration(
+        color: Colors.black, // Couleur sombre forcée pour le header
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
