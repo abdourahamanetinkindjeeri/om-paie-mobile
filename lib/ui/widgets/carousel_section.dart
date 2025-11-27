@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/model/carousel.item.dart';
 import 'package:om_paie_flutter/ui/widgets/carousel_page.dart';
 
-class CarouselSection extends StatelessWidget {
+class CarouselSection extends StatefulWidget {
   final PageController pageController;
   final int currentPage;
   final Function(int) onPageChanged;
@@ -13,6 +14,41 @@ class CarouselSection extends StatelessWidget {
     required this.currentPage,
     required this.onPageChanged,
   }) : super(key: key);
+
+  @override
+  State<CarouselSection> createState() => _CarouselSectionState();
+}
+
+class _CarouselSectionState extends State<CarouselSection> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startAutoScroll();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _startAutoScroll() {
+    _timer = Timer.periodic(const Duration(seconds: 5), (Timer timer) {
+      if (widget.pageController.hasClients) {
+        int nextPage = widget.currentPage + 1;
+        if (nextPage >= _carouselItems.length) {
+          nextPage = 0;
+        }
+        widget.pageController.animateToPage(
+          nextPage,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
 
   static const List<CarouselItem> _carouselItems = [
     CarouselItem(
@@ -46,8 +82,8 @@ class CarouselSection extends StatelessWidget {
     return Expanded(
       flex: 6,
       child: PageView(
-        controller: pageController,
-        onPageChanged: onPageChanged,
+        controller: widget.pageController,
+        onPageChanged: widget.onPageChanged,
         children: _carouselItems
             .map((item) => CarouselPage(
                   title: item.title,
