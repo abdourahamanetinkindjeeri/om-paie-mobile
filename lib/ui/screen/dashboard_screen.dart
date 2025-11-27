@@ -335,10 +335,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return;
     }
 
+    // Ajout du préfixe +221 si absent
+    String recipientFormatted = recipient.trim();
+    if (!recipientFormatted.startsWith('+221')) {
+      // Retire les éventuels zéros initiaux
+      recipientFormatted =
+          '+221' + recipientFormatted.replaceFirst(RegExp(r'^0+'), '');
+    }
+
     try {
       final response = await widget.compteService.transfer(
         numeroCompte: principalAccountId,
-        telephoneDestinataire: recipient,
+        telephoneDestinataire: recipientFormatted,
         montant: int.parse(amount),
       );
 
