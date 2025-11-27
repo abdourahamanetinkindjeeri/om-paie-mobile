@@ -1,7 +1,7 @@
 import 'package:om_paie_flutter/providers/language_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
-import 'package:om_paie_flutter/ui/widgets/qr_scanner_screen.dart';
+import 'package:om_paie_flutter/pages/qr_scanner_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:om_paie_flutter/constants/app_strings.dart';
 

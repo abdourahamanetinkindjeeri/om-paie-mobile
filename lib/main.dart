@@ -89,7 +89,7 @@ class OrangeMoneyApp extends StatelessWidget {
           themeMode: themeProvider.themeMode,
           locale: languageProvider.locale,
           supportedLocales: const [Locale('fr'), Locale('en')],
-          localizationsDelegates: [
+          localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,

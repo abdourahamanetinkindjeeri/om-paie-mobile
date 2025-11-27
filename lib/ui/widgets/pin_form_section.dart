@@ -6,8 +6,8 @@ import 'package:om_paie_flutter/constants/app_strings.dart';
 import 'package:om_paie_flutter/features/auth/auth.service.dart';
 import 'package:om_paie_flutter/features/auth/itoken_manager.dart';
 import 'package:om_paie_flutter/features/comptes/compte.service.dart';
-import 'package:om_paie_flutter/ui/screen/otp_screen.dart';
-import 'package:om_paie_flutter/ui/screen/dashboard_screen.dart';
+import 'package:om_paie_flutter/pages/otp_screen.dart';
+import 'package:om_paie_flutter/pages/dashboard_screen.dart';
 
 class PinFormSection extends StatefulWidget {
   final String phoneNumber;
