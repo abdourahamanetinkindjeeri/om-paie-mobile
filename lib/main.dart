@@ -13,13 +13,15 @@ import 'package:om_paie_flutter/features/auth/token_manager_mobile.dart';
 import 'package:om_paie_flutter/features/comptes/compte.service.dart';
 import 'package:om_paie_flutter/providers/auth_provider.dart';
 import 'package:om_paie_flutter/providers/compte_provider.dart';
+import 'package:om_paie_flutter/providers/dashboard_provider.dart';
+import 'package:om_paie_flutter/providers/language_provider.dart';
+import 'package:om_paie_flutter/providers/login_provider.dart';
 import 'package:om_paie_flutter/providers/theme_provider.dart';
 import 'package:om_paie_flutter/routes/route.dart';
 import 'package:om_paie_flutter/ui/widgets/carousel_section.dart';
 import 'package:om_paie_flutter/ui/widgets/login_form_section.dart';
 import 'package:om_paie_flutter/ui/widgets/pin_carousel_section.dart';
 import 'package:om_paie_flutter/ui/widgets/pin_form_section.dart';
-import 'package:om_paie_flutter/providers/language_provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() async {
@@ -66,6 +68,20 @@ void main() async {
         ChangeNotifierProvider(
           create: (_) => LanguageProvider(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => LoginProvider(
+            authService: authService,
+            tokenManager: tokenManager,
+            compteService: compteService,
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => DashboardProvider(
+            authService: authService,
+            tokenManager: tokenManager,
+            compteService: compteService,
+          ),
+        ),
       ],
       child: const OrangeMoneyApp(),
     ),
@@ -95,18 +111,7 @@ class OrangeMoneyApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate,
           ],
           initialRoute: AppRoutes.home,
-          onGenerateRoute: (settings) {
-            final authProvider =
-                Provider.of<AuthProvider>(context, listen: false);
-            final compteProvider =
-                Provider.of<CompteProvider>(context, listen: false);
-            return AppRoutes.onGenerateRoute(
-              settings,
-              authService: authProvider.authService,
-              tokenManager: authProvider.tokenManager,
-              compteService: compteProvider.compteService,
-            );
-          },
+          onGenerateRoute: (settings) => AppRoutes.onGenerateRoute(settings),
           routes: {
             AppRoutes.home: (context) => const LoginScreen(),
             AppRoutes.login: (context) => const LoginScreen(),
@@ -118,67 +123,44 @@ class OrangeMoneyApp extends StatelessWidget {
   }
 }
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _phoneController = TextEditingController();
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
-  String _countryCode = '+221'; // Code pays par défaut
-
-  @override
-  void dispose() {
-    _phoneController.dispose();
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          CarouselSection(
-            pageController: _pageController,
-            currentPage: _currentPage,
-            onPageChanged: (int index) {
-              setState(() {
-                _currentPage = index;
-              });
-            },
+    return Consumer<LoginProvider>(
+      builder: (context, loginProvider, child) {
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          body: Column(
+            children: [
+              CarouselSection(
+                pageController: loginProvider.pageController,
+                currentPage: loginProvider.currentPage,
+                onPageChanged: loginProvider.updateCurrentPage,
+              ),
+              LoginFormSection(
+                currentPage: loginProvider.currentPage,
+                phoneController: loginProvider.phoneController,
+                pageController: loginProvider.pageController,
+                onCountryCodeChanged: loginProvider.updateCountryCode,
+                onLoginPressed: () {
+                  if (loginProvider.phoneController.text.isNotEmpty) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute<PinCodeScreen>(
+                        builder: (BuildContext context) => PinCodeScreen(
+                          phoneNumber: loginProvider.fullPhoneNumber,
+                        ),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ],
           ),
-          LoginFormSection(
-            currentPage: _currentPage,
-            phoneController: _phoneController,
-            pageController: _pageController,
-            onCountryCodeChanged: (String newCode) {
-              setState(() {
-                _countryCode = newCode;
-              });
-            },
-            onLoginPressed: () {
-              if (_phoneController.text.isNotEmpty) {
-                // Combiner le code pays avec le numéro saisi
-                final fullPhoneNumber = '$_countryCode${_phoneController.text}';
-                Navigator.push(
-                  context,
-                  MaterialPageRoute<PinCodeScreen>(
-                    builder: (BuildContext context) => PinCodeScreen(
-                      phoneNumber: fullPhoneNumber,
-                    ),
-                  ),
-                );
-              }
-            },
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -206,9 +188,6 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
           const PinCarouselSection(),
           PinFormSection(
             phoneNumber: widget.phoneNumber,
-            authService: context.read<AuthProvider>().authService,
-            tokenManager: context.read<AuthProvider>().tokenManager,
-            compteService: context.read<CompteProvider>().compteService,
           ),
         ],
       ),

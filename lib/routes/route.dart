@@ -21,20 +21,11 @@ class AppRoutes {
   static const String transactions = '/transactions';
 
   /// Générateur de routes dynamiques pour les routes avec paramètres
-  static Route<dynamic>? onGenerateRoute(
-    RouteSettings settings, {
-    required AuthService authService,
-    required ITokenManager tokenManager,
-    required CompteService compteService,
-  }) {
+  static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case dashboard:
         return MaterialPageRoute(
-          builder: (context) => DashboardScreen(
-            authService: authService,
-            tokenManager: tokenManager,
-            compteService: compteService,
-          ),
+          builder: (context) => const DashboardScreen(),
         );
 
       case otp:
@@ -43,9 +34,6 @@ class AppRoutes {
           return MaterialPageRoute(
             builder: (context) => OtpScreen(
               phoneNumber: args['phoneNumber'] as String,
-              authService: authService,
-              tokenManager: tokenManager,
-              compteService: compteService,
             ),
           );
         }

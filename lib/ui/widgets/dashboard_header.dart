@@ -31,7 +31,9 @@ class _DashboardHeaderState extends State<DashboardHeader> {
         '${widget.userProfile?['prenom'] ?? ''} ${widget.userProfile?['nom'] ?? 'Utilisateur'}'
             .trim();
     final balance = widget.comptes.isNotEmpty
-        ? widget.comptes[0]['solde']?.toString() ?? '0'
+        ? (widget.comptes[0]['solde'] is num
+            ? (widget.comptes[0]['solde'] as num).toStringAsFixed(3)
+            : widget.comptes[0]['solde']?.toString() ?? '0')
         : '0';
     final devise = widget.comptes.isNotEmpty
         ? widget.comptes[0]['devise'] ?? 'CFA'

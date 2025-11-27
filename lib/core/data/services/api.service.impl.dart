@@ -137,8 +137,7 @@ class ApiServiceImpl implements IApiService {
     return _executeWithRetry(() async {
       final normalizedEndpoint = _normalizeEndpoint(endpoint);
       final fullUrl = '$baseUrl/$normalizedEndpoint';
-      print('🌐 POST Request: $fullUrl');
-      print('📦 Body: ${jsonEncode(data)}');
+
       final response = await client.post(
         Uri.parse(fullUrl),
         headers: _jsonHeaders(),

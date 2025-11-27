@@ -1,25 +1,16 @@
 import 'package:provider/provider.dart';
+import 'package:om_paie_flutter/providers/auth_provider.dart';
 import 'package:om_paie_flutter/providers/language_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/constants/app_strings.dart';
-import 'package:om_paie_flutter/features/auth/auth.service.dart';
-import 'package:om_paie_flutter/features/auth/itoken_manager.dart';
-import 'package:om_paie_flutter/features/comptes/compte.service.dart';
-import 'package:om_paie_flutter/pages/dashboard_screen.dart';
 
 class OtpFormSection extends StatefulWidget {
   final String phoneNumber;
-  final AuthService authService;
-  final ITokenManager tokenManager;
-  final CompteService compteService;
 
   const OtpFormSection({
     Key? key,
     required this.phoneNumber,
-    required this.authService,
-    required this.tokenManager,
-    required this.compteService,
   }) : super(key: key);
 
   @override
@@ -74,12 +65,15 @@ class _OtpFormSectionState extends State<OtpFormSection> {
 
   Future<void> _confirmOtp() async {
     try {
-      final confirmResponse = await widget.authService.confirmLoginOTP(
+      final authService = context.read<AuthProvider>().authService;
+      final tokenManager = context.read<AuthProvider>().tokenManager;
+
+      final confirmResponse = await authService.confirmLoginOTP(
         telephone: widget.phoneNumber,
         otpCode: otpCode,
       );
 
-      await widget.tokenManager.setTokens(
+      await tokenManager.setTokens(
         accessToken: confirmResponse['access_token'],
         refreshToken: confirmResponse['refresh_token'],
       );
@@ -92,15 +86,7 @@ class _OtpFormSectionState extends State<OtpFormSection> {
           ),
         );
         // Naviguer vers le dashboard
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => DashboardScreen(
-              authService: widget.authService,
-              tokenManager: widget.tokenManager,
-              compteService: widget.compteService,
-            ),
-          ),
-        );
+        Navigator.of(context).pushReplacementNamed('/dashboard');
       }
     } catch (e) {
       if (mounted) {
