@@ -79,8 +79,10 @@ class OrangeMoneyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<ThemeProvider, LanguageProvider>(
       builder: (context, themeProvider, languageProvider, child) {
+        final lang = languageProvider.locale.languageCode;
+        final strings = AppStrings.of(lang);
         return MaterialApp(
-          title: AppStrings.appTitle,
+          title: strings.appTitle,
           debugShowCheckedModeBanner: false,
           theme: AppThemes.lightTheme,
           darkTheme: AppThemes.darkTheme,

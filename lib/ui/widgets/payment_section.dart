@@ -1,6 +1,9 @@
+import 'package:om_paie_flutter/providers/language_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/ui/widgets/qr_scanner_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:om_paie_flutter/constants/app_strings.dart';
 
 class PaymentSection extends StatefulWidget {
   final Future<void> Function(String amount, String recipient) onPayPressed;
@@ -32,6 +35,8 @@ class _PaymentSectionState extends State<PaymentSection> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final lang = Provider.of<LanguageProvider>(context).locale.languageCode;
+    final strings = AppStrings.of(lang);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
@@ -82,7 +87,7 @@ class _PaymentSectionState extends State<PaymentSection> {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          'Payer',
+                          lang == 'fr' ? 'Payer' : 'Pay',
                           style: TextStyle(
                             color: _isPaymentSelected
                                 ? Colors.white
@@ -136,7 +141,7 @@ class _PaymentSectionState extends State<PaymentSection> {
                         ),
                         const SizedBox(width: 6),
                         Text(
-                          'Transférer',
+                          lang == 'fr' ? 'Transférer' : 'Transfer',
                           style: TextStyle(
                             color: !_isPaymentSelected
                                 ? Colors.white
@@ -182,8 +187,12 @@ class _PaymentSectionState extends State<PaymentSection> {
                       style: TextStyle(color: theme.textTheme.bodyLarge?.color),
                       decoration: InputDecoration(
                         hintText: _isPaymentSelected
-                            ? 'Saisir le code marchand'
-                            : 'Saisir le numéro de téléphone',
+                            ? (lang == 'fr'
+                                ? 'Saisir le code marchand'
+                                : 'Enter merchant code')
+                            : (lang == 'fr'
+                                ? 'Saisir le numéro de téléphone'
+                                : 'Enter phone number'),
                         hintStyle:
                             TextStyle(color: theme.textTheme.bodySmall?.color),
                         filled: true,
@@ -203,7 +212,8 @@ class _PaymentSectionState extends State<PaymentSection> {
                       keyboardType: TextInputType.number,
                       style: TextStyle(color: theme.textTheme.bodyLarge?.color),
                       decoration: InputDecoration(
-                        hintText: 'Saisir le montant',
+                        hintText:
+                            lang == 'fr' ? 'Saisir le montant' : 'Enter amount',
                         hintStyle:
                             TextStyle(color: theme.textTheme.bodySmall?.color),
                         filled: true,
@@ -247,8 +257,9 @@ class _PaymentSectionState extends State<PaymentSection> {
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(
-                                'Numéro scanné: $result\nMode Transfert activé'),
+                            content: Text(lang == 'fr'
+                                ? 'Numéro scanné: $result\nMode Transfert activé'
+                                : 'Scanned number: $result\nTransfer mode activated'),
                             backgroundColor: AppColors.primary,
                             duration: const Duration(seconds: 2),
                           ),
@@ -309,9 +320,9 @@ class _PaymentSectionState extends State<PaymentSection> {
                 ),
                 elevation: 0,
               ),
-              child: const Text(
-                'Valider',
-                style: TextStyle(
+              child: Text(
+                strings.validateButton,
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -336,9 +347,9 @@ class _PaymentSectionState extends State<PaymentSection> {
                     color: AppColors.primary,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Text(
-                    'Max it',
-                    style: TextStyle(
+                  child: Text(
+                    lang == 'fr' ? 'Max it' : 'Max it',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
@@ -347,7 +358,7 @@ class _PaymentSectionState extends State<PaymentSection> {
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Accéder à Max it',
+                  lang == 'fr' ? 'Accéder à Max it' : 'Access Max it',
                   style: TextStyle(
                     color: theme.textTheme.bodyLarge?.color,
                     fontSize: 12,
@@ -359,7 +370,9 @@ class _PaymentSectionState extends State<PaymentSection> {
           ),
           const SizedBox(height: 6),
           Text(
-            'Pour toute autre opération',
+            lang == 'fr'
+                ? 'Pour toute autre opération'
+                : 'For any other operation',
             style: TextStyle(
               color: theme.textTheme.bodySmall?.color,
               fontSize: 11,

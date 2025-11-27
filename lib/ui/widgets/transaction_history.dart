@@ -1,3 +1,5 @@
+import 'package:provider/provider.dart';
+import 'package:om_paie_flutter/providers/language_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 
@@ -73,6 +75,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final lang = Provider.of<LanguageProvider>(context).locale.languageCode;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
@@ -83,7 +86,7 @@ class _TransactionHistoryState extends State<TransactionHistory> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Historique',
+                lang == 'fr' ? 'Historique' : 'History',
                 style: TextStyle(
                   color: theme.textTheme.bodyLarge?.color,
                   fontSize: 18,

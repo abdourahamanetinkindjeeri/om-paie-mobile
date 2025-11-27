@@ -1,3 +1,5 @@
+import 'package:provider/provider.dart';
+import 'package:om_paie_flutter/providers/language_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/constants/app_strings.dart';
@@ -18,7 +20,6 @@ class PhoneInputRow extends StatefulWidget {
 
 class _PhoneInputRowState extends State<PhoneInputRow> {
   String _countryCode = '+221';
-  String _countryFlag = '🇸🇳';
 
   String get fullPhoneNumber => '$_countryCode${widget.controller.text}';
 
@@ -33,6 +34,8 @@ class _PhoneInputRowState extends State<PhoneInputRow> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context).locale.languageCode;
+    final strings = AppStrings.of(lang);
     return Row(
       children: <Widget>[
         Container(
@@ -52,13 +55,13 @@ class _PhoneInputRowState extends State<PhoneInputRow> {
                   borderRadius: BorderRadius.circular(3),
                 ),
                 child: Text(
-                  _countryFlag,
+                  strings.countryFlag,
                   style: const TextStyle(fontSize: 20),
                 ),
               ),
               const SizedBox(width: 8),
               Text(
-                _countryCode,
+                strings.countryCode,
                 style: const TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 15,
@@ -84,7 +87,7 @@ class _PhoneInputRowState extends State<PhoneInputRow> {
               fontSize: 15,
             ),
             decoration: InputDecoration(
-              hintText: AppStrings.phoneHint,
+              hintText: strings.phoneHint,
               hintStyle: const TextStyle(
                 color: AppColors.textMuted,
                 fontSize: 15,

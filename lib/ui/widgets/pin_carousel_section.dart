@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/ui/screen/custom.clip_path.dart';
+import 'package:om_paie_flutter/providers/language_provider.dart';
+import 'package:om_paie_flutter/constants/app_strings.dart';
 
 class PinCarouselSection extends StatelessWidget {
   const PinCarouselSection({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context).locale.languageCode;
+    final strings = AppStrings.of(lang);
     return Expanded(
       flex: 6,
       child: Container(
@@ -105,19 +110,21 @@ class PinCarouselSection extends StatelessWidget {
                       ),
                       const SizedBox(width: 14),
                       RichText(
-                        text: const TextSpan(
+                        text: TextSpan(
                           children: <TextSpan>[
                             TextSpan(
-                              text: 'Orange ',
-                              style: TextStyle(
+                              text: strings.appTitle.split(' ')[0] + ' ',
+                              style: const TextStyle(
                                 color: AppColors.primary,
                                 fontSize: 26,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             TextSpan(
-                              text: 'Money',
-                              style: TextStyle(
+                              text: strings.appTitle.split(' ').length > 1
+                                  ? strings.appTitle.split(' ')[1]
+                                  : '',
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 26,
                                 fontWeight: FontWeight.bold,
@@ -130,11 +137,11 @@ class PinCarouselSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 35),
                   RichText(
-                    text: const TextSpan(
+                    text: TextSpan(
                       children: <TextSpan>[
                         TextSpan(
-                          text: 'Code PIN ',
-                          style: TextStyle(
+                          text: lang == 'fr' ? 'Code PIN ' : 'PIN ',
+                          style: const TextStyle(
                             color: AppColors.primary,
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
@@ -142,8 +149,8 @@ class PinCarouselSection extends StatelessWidget {
                           ),
                         ),
                         TextSpan(
-                          text: 'de sécurité',
-                          style: TextStyle(
+                          text: lang == 'fr' ? 'de sécurité' : 'security',
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 30,
                             fontWeight: FontWeight.w300,
@@ -154,9 +161,11 @@ class PinCarouselSection extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 14),
-                  const Text(
-                    'Saisissez votre code PIN à 4 chiffres\npour accéder à votre compte\nOrange Money en toute sécurité.',
-                    style: TextStyle(
+                  Text(
+                    lang == 'fr'
+                        ? 'Saisissez votre code PIN à 4 chiffres\npour accéder à votre compte\nOrange Money en toute sécurité.'
+                        : 'Enter your 4-digit PIN code\nto access your Orange Money account\nsecurely.',
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 15,
                       height: 1.5,

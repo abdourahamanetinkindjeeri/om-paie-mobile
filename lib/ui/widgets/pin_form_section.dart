@@ -1,3 +1,5 @@
+import 'package:provider/provider.dart';
+import 'package:om_paie_flutter/providers/language_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/constants/app_strings.dart';
@@ -26,7 +28,8 @@ class PinFormSection extends StatefulWidget {
 }
 
 class _PinFormSectionState extends State<PinFormSection> {
-  final List<TextEditingController> _controllers = List<TextEditingController>.generate(
+  final List<TextEditingController> _controllers =
+      List<TextEditingController>.generate(
     4,
     (int index) => TextEditingController(),
   );
@@ -98,7 +101,8 @@ class _PinFormSectionState extends State<PinFormSection> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirmation OTP'),
-          content: const Text('Voulez-vous utiliser le code OTP automatiquement ou le saisir manuellement ?'),
+          content: const Text(
+              'Voulez-vous utiliser le code OTP automatiquement ou le saisir manuellement ?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -178,6 +182,8 @@ class _PinFormSectionState extends State<PinFormSection> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context).locale.languageCode;
+    final strings = AppStrings.of(lang);
     return Expanded(
       flex: 5,
       child: Container(
@@ -188,7 +194,7 @@ class _PinFormSectionState extends State<PinFormSection> {
             children: <Widget>[
               const SizedBox(height: 20),
               Text(
-                AppStrings.pinInstruction,
+                strings.pinInstruction,
                 style: const TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 22,
@@ -197,7 +203,7 @@ class _PinFormSectionState extends State<PinFormSection> {
               ),
               const SizedBox(height: 8),
               Text(
-                '+221 ${widget.phoneNumber}',
+                '${strings.countryCode} ${widget.phoneNumber}',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: AppColors.textSecondary,
@@ -248,7 +254,8 @@ class _PinFormSectionState extends State<PinFormSection> {
                       ),
                       onChanged: (String value) => _onPinChanged(index, value),
                       onTap: () {
-                        _controllers[index].selection = TextSelection.fromPosition(
+                        _controllers[index].selection =
+                            TextSelection.fromPosition(
                           TextPosition(offset: _controllers[index].text.length),
                         );
                       },
@@ -281,7 +288,7 @@ class _PinFormSectionState extends State<PinFormSection> {
                     elevation: 0,
                   ),
                   child: Text(
-                    AppStrings.validateButton,
+                    strings.validateButton,
                     style: const TextStyle(
                       color: AppColors.textPrimary,
                       fontSize: 17,
@@ -292,7 +299,7 @@ class _PinFormSectionState extends State<PinFormSection> {
               ),
               const SizedBox(height: 18),
               Text(
-                AppStrings.copyright,
+                strings.copyright,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: AppColors.textMuted,

@@ -1,3 +1,5 @@
+import 'package:provider/provider.dart';
+import 'package:om_paie_flutter/providers/language_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/constants/app_strings.dart';
@@ -25,7 +27,8 @@ class OtpFormSection extends StatefulWidget {
 }
 
 class _OtpFormSectionState extends State<OtpFormSection> {
-  final List<TextEditingController> _controllers = List<TextEditingController>.generate(
+  final List<TextEditingController> _controllers =
+      List<TextEditingController>.generate(
     6,
     (int index) => TextEditingController(),
   );
@@ -113,6 +116,8 @@ class _OtpFormSectionState extends State<OtpFormSection> {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context).locale.languageCode;
+    final strings = AppStrings.of(lang);
     return Expanded(
       flex: 5,
       child: Container(
@@ -123,7 +128,7 @@ class _OtpFormSectionState extends State<OtpFormSection> {
             children: <Widget>[
               const SizedBox(height: 20),
               Text(
-                'Saisir le code OTP',
+                lang == 'fr' ? 'Saisir le code OTP' : 'Enter OTP code',
                 style: const TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 22,
@@ -132,7 +137,7 @@ class _OtpFormSectionState extends State<OtpFormSection> {
               ),
               const SizedBox(height: 8),
               Text(
-                '+221 ${widget.phoneNumber}',
+                '${strings.countryCode} ${widget.phoneNumber}',
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: AppColors.textSecondary,
@@ -182,7 +187,8 @@ class _OtpFormSectionState extends State<OtpFormSection> {
                       ),
                       onChanged: (String value) => _onOtpChanged(index, value),
                       onTap: () {
-                        _controllers[index].selection = TextSelection.fromPosition(
+                        _controllers[index].selection =
+                            TextSelection.fromPosition(
                           TextPosition(offset: _controllers[index].text.length),
                         );
                       },
@@ -192,7 +198,7 @@ class _OtpFormSectionState extends State<OtpFormSection> {
               ),
               const SizedBox(height: 30),
               Text(
-                AppStrings.copyright,
+                strings.copyright,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: AppColors.textMuted,

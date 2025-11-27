@@ -1,3 +1,5 @@
+import 'package:provider/provider.dart';
+import 'package:om_paie_flutter/providers/language_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:om_paie_flutter/constants/app_colors.dart';
 import 'package:om_paie_flutter/constants/app_strings.dart';
@@ -23,6 +25,8 @@ class LoginFormSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final lang = Provider.of<LanguageProvider>(context).locale.languageCode;
+    final strings = AppStrings.of(lang);
     return Expanded(
       flex: 5,
       child: Container(
@@ -43,7 +47,7 @@ class LoginFormSection extends StatelessWidget {
               ),
               const SizedBox(height: 35),
               Text(
-                AppStrings.welcomeMessage,
+                strings.welcomeMessage,
                 style: const TextStyle(
                   color: AppColors.textPrimary,
                   fontSize: 22,
@@ -52,7 +56,7 @@ class LoginFormSection extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                AppStrings.loginInstruction,
+                strings.loginInstruction,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: AppColors.textSecondary,
@@ -71,7 +75,7 @@ class LoginFormSection extends StatelessWidget {
               ),
               const SizedBox(height: 18),
               Text(
-                AppStrings.copyright,
+                strings.copyright,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: AppColors.textMuted,
